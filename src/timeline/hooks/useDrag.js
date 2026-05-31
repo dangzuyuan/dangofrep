@@ -11,38 +11,6 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { snapToGrid, pixelToMinutes, findNearestBar } from './utils';
 
 /**
- * 时间吸附函数（Snap to Grid）
- * @param {number} minutes - 原始分钟数
- * @param {number} timejiange - 时间步长（分钟）
- * @returns {number} 吸附后的分钟数
- */
-export function snapToGrid(minutes, timejiange) {
-  return Math.round(minutes / timejiange) * timejiange;
-}
-
-/**
- * 将像素位置转换为分钟偏移量
- * @param {number} pixelY - Y轴像素位置
- * @param {number} containerHeight - 容器总高度（px）
- * @param {number} totalMinutes - 总分钟数（endtime - begintime）
- * @returns {number} 分钟偏移量
- */
-export function pixelToMinutes(pixelY, containerHeight, totalMinutes) {
-  return (pixelY / containerHeight) * totalMinutes;
-}
-
-/**
- * 将分钟偏移量转换为像素位置
- * @param {number} minutes - 分钟偏移量
- * @param {number} containerHeight - 容器总高度（px）
- * @param {number} totalMinutes - 总分钟数
- * @returns {number} 像素位置
- */
-export function minutesToPixel(minutes, containerHeight, totalMinutes) {
-  return (minutes / totalMinutes) * containerHeight;
-}
-
-/**
  * Hook: 事件拖拽移动
  * 
  * 采用成熟的文档级事件监听模式（参考正式版beta1）：
