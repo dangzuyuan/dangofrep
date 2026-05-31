@@ -8,6 +8,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { snapToGrid, pixelToMinutes, findNearestBar } from './utils';
 
 /**
  * 时间吸附函数（Snap to Grid）
@@ -427,9 +428,6 @@ export function useDragResize({
     const handleMouseMove = (moveEvent) => {
       if (!resizeRef.current) return;
 
-      var el = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
-      if (el && el.closest && el.closest('[data-event-bar]')) return;
-
       const {
         startY,
         containerHeight,
@@ -452,19 +450,15 @@ export function useDragResize({
       let newEndMin = originalEndMin;
 
       if (direction === 'top') {
-        // 拉伸顶部：改变开始时间
         newStartMin = originalStartMin + deltaMinutes;
-        
-        // 统一边界钳位（避免互相覆盖）
-        const maxStart = newEndMin - timejiange; // 最多只能拉伸到结束时间之前一个步长
+        const maxStart = newEndMin - timejiange;
         newStartMin = Math.max(minMinutes, Math.min(maxStart, newStartMin));
+        newStartMin = findNearestBar(resizeRef.current.resourceId, 'top', newStartMin, originalStartMin, containerHeight, totalMinutes);
       } else {
-        // 拉伸底部：改变结束时间
         newEndMin = originalEndMin + deltaMinutes;
-        
-        // 统一边界钳位（避免互相覆盖）
-        const minEnd = newStartMin + timejiange; // 最少要保持一个步长的持续时间
+        const minEnd = newStartMin + timejiange;
         newEndMin = Math.max(minEnd, Math.min(maxMinutes, newEndMin));
+        newEndMin = findNearestBar(resizeRef.current.resourceId, 'bottom', newEndMin, originalEndMin, containerHeight, totalMinutes);
       }
 
       // 更新 ref 中的预览状态

@@ -7,7 +7,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { snapToGrid, pixelToMinutes } from './utils';
+import { snapToGrid, pixelToMinutes, findNearestBar } from './utils';
 
 export function useBoxSelect({ onSelectSlot, begintime, endtime, timejiange }) {
   const [isSelecting, setIsSelecting] = useState(false);
@@ -64,11 +64,15 @@ export function useBoxSelect({ onSelectSlot, begintime, endtime, timejiange }) {
 
       const rect = container.getBoundingClientRect();
       const currentY = moveEvent.clientY - rect.top;
-      const currentMin = Math.max(0, Math.min(totalMinutes, (currentY / containerHeight) * totalMinutes));
+      var currentMin = (currentY / containerHeight) * totalMinutes;
+      currentMin = Math.max(0, Math.min(totalMinutes, currentMin));
 
-      // 鼠标下方有事件条 → 停止扩展，使用上次位置
-      var el = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
-      if (el && el.closest && el.closest('[data-event-bar]')) return;
+      // 钳制到最近bar边界（替换 elementFromPoint）
+      if (currentMin > selectRef.current.startMin) {
+        currentMin = findNearestBar(selectRef.current.resourceId, 'bottom', currentMin, selectRef.current.startMin, containerHeight, totalMinutes);
+      } else if (currentMin < selectRef.current.startMin) {
+        currentMin = findNearestBar(selectRef.current.resourceId, 'top', currentMin, selectRef.current.startMin, containerHeight, totalMinutes);
+      }
 
       const sMin = Math.min(selectRef.current.startMin, currentMin);
       const eMin = Math.max(selectRef.current.startMin, currentMin);
