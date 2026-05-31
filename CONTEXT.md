@@ -188,6 +188,32 @@ App.jsx 监听窗口大小和 env 参数（forceMobile/colwidth），算出 colW
 ✅ 正确: 替换时保留变量声明行
 ```
 
+### R18: 编辑安全 — 禁止在 import/export 括号内注释
+
+**事故 (2026-05-30)**: 清理代码时在 `import React, { useRef, /* useCallback */, useEffect }` 中使用块注释。Babel 不支持 import 解构内注释，编译失败。
+
+**规则**:
+- ❌ `import { a, /* b */, c }` — Babel 不兼容
+- ✅ 注释放在 import 语句**之前**的单独行
+- ✅ 注释放在 import 语句**之后**的 `//` 行注释
+
+```
+❌ import React, { useRef, /* old */, useEffect }  → 编译失败
+✅ // old import: React, { useRef, useCallback, useEffect }
+   import React, { useRef, useEffect }
+✅ import React, { useRef, useEffect } // useCallback removed
+```
+
+### R19: 文件放置验证 — 逐文件确认而非"一把复制"
+
+**事故 (2026-05-30)**: Step2 时 `Copy-Item 参考/timecalendar/utils/* → src/utils/` 无差别复制，将纯展示层文件 `eventLayout.js`（零 mdye 依赖）错误放入业务层，导致展示层重叠布局功能失效。
+
+**规则**:
+1. **禁止 `Copy-Item dir/*` 一把复制**——每个文件单独复制
+2. 复制前 `grep "import.*mdye" 文件` → 有 mdye 依赖 → 放 `src/utils/`
+3. 无 mdye 依赖 → 放 `src/timeline/hooks/` 或 `src/timeline/`
+4. 复制后立即确认文件位置与 R1 约束一致
+
 ---
 
 ## 术语表

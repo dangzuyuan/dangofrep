@@ -6,6 +6,7 @@ import StaffColumn from './StaffColumn';
 import EventBar from './EventBar';
 import { useDragMove, useDragResize } from './hooks/useDrag';
 import { useBoxSelect } from './hooks/useBoxSelect';
+import { calculateEventLayout } from './hooks/eventLayout';
 
 const AppContainer = styled.div`
   width: 100%;
@@ -82,7 +83,6 @@ const BodyAxisCell = styled.div`
 export default function TimeCalendar({
   resources = [],
   events = [],
-  eventLayoutsMap = {},  // 预计算的事件布局映射表（性能优化）
   departmentTree = [],
   begintime = "07:00",
   endtime = "23:00",
@@ -223,9 +223,13 @@ export default function TimeCalendar({
           </BodyAxisCell>
           {resources.map((s, idx) => {
             const staffEvents = events.filter(ev => ev.resourceId === s.id || ev.resourceId === s.accountId);
-            
-            // 使用预计算的布局（性能优化）
-            const eventLayouts = eventLayoutsMap[s.id] || [];
+            const mainEvents = staffEvents.filter(function(ev) { return !ev.isBackground; });
+            var mainLayouts = calculateEventLayout(mainEvents);
+            var mi = 0;
+            var eventLayouts = staffEvents.map(function(ev) {
+              if (ev.isBackground) return { left: 0, width: 100, zIndex: 1 };
+              return mainLayouts[mi++] || { left: 0, width: 100, zIndex: 1 };
+            });
             
             // 计算时间基准（用于预览条）
             const [sh, sm] = begintime.split(":").map(Number);

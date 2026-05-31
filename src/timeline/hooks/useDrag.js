@@ -370,7 +370,8 @@ export function useDragResize({
 
       if (event.isBackground) return;
 
-      // [修复] 移除 preventDefault/stopPropagation
+      // [修复] resize 需要 preventDefault 阻止文本选中（move/box 不需要）
+      e.preventDefault();
 
       // 通过 resourceId 直接查找对应的 StaffColumn 容器
       const container = document.querySelector(`[data-resource-id="${resourceId}"]`);
@@ -425,6 +426,9 @@ export function useDragResize({
   useEffect(() => {
     const handleMouseMove = (moveEvent) => {
       if (!resizeRef.current) return;
+
+      var el = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
+      if (el && el.closest && el.closest('[data-event-bar]')) return;
 
       const {
         startY,

@@ -76,7 +76,9 @@ export default function App() {
 
   var isMobile = forceMobile || colWidth === COL_WIDTH_MOBILE;
   var axisWidth = isMobile ? 60 : AXIS_WIDTH;
-  var slotHeight = 30;
+  var slotHeight = isMobile
+    ? Math.max(24, (window.innerHeight * 0.6) / Math.ceil(((Number(endtime.split(":")[0]) * 60 + Number(endtime.split(":")[1])) - (Number(begintime.split(":")[0]) * 60 + Number(begintime.split(":")[1]))) / timejiange))
+    : 30;
 
   var { staffMap, events, loading, logs, isSilentReload, controlsRef } =
     useDataLoader(currentDate, refreshKey);

@@ -1,4 +1,5 @@
-import React, { useRef, useCallback, useEffect } from "react";
+// [清理 2026-05-30] 移除未使用的 useCallback
+import React, { useRef, useEffect } from "react";
 import styled from "styled-components";
 
 const Bar = styled.div`
@@ -69,8 +70,9 @@ export default function EventBar({
   style: extraStyle
 }) {
   const mouseDownPos = useRef({ x: 0, y: 0 });
-  const onClickRef = useRef(onClick);
-  onClickRef.current = onClick;
+  // [清理 2026-05-30] onClickRef 未使用，handleBarClick 已改用 window.__openRecord
+  // const onClickRef = useRef(onClick);
+  // onClickRef.current = onClick;
   const dragMovedRef = useRef(false);
 
   useEffect(function() {
