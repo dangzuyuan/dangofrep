@@ -1,58 +1,32 @@
-# 会话断点
+# Session Handoff / 会话接续
 
-**日期**: 2026-05-31  
-**分支**: overlap-fix（当前工作分支）
+> 最后更新: 2026-06-06 08:15
+> Last updated: 2026-06-06 08:15
 
----
+## 刚刚完成 / Just Completed
 
-## 本次完成
+- 修复横向滚动时间轴遮挡与锚定区消失问题（3项改动）：
+  1. BodyAxisCell z-index: 1→6 + background 改为不透明 #fafafa（防止事件条透过半透明背景）
+  2. getEventPosition 事件起止时间钳制到 begintime~endtime 范围（防止溢出时间轴）
+  3. HeaderRow + BodyRow 统一 width: max-content; min-width: 100%（sticky left:0 子元素粘性范围覆盖全部内容）
 
-### 移动重叠检测（useDragMove）
-- 新建 `overlapScanner.js` — 纯 DOM 扫描函数
-- 拆分 `useDrag.js` → `useDragMove.js` / `useDragResize.js` / `useDragCreate.js`
-- EventBar + data-event-id / data-is-background / isOverlapping 样式（红/蓝）
-- TimeCalendar 透传 isOverlapping prop
+## 正在进行 / In Progress
 
-### 坐标系 Bug 修复
-- useDragMove: `scanColumnOverlap` 入参转偏移分钟（`- minMinutes`）
-- useDragResize: `findNearestBar` 入参转偏移分钟（`- minMinutes` 入 / `+ minMinutes` 出）
+- 无
 
-### 文本选中修复
-- useDragMove / useDragResize：mousedown 设 `userSelect: none`，所有清理路径恢复
+## 下一步 / Next Steps
 
-### 拉伸松手优化
-- useDragResize：`_final` 标记 → 位置保留 + 样式立即恢复
-- TimeCalendar：拆分 `hasPendingResize`（位置）和 `isResizing`（样式）
+1. 在明道云容器内测试横向滚动：锚定区(SplitCorner)和时间轴(BodyAxisCell)是否始终固定不消失
+2. 测试事件条是否不再超出时间轴边界
+3. 测试半透明背景事件条是否不再透过时间轴
 
-### 其他
-- findNearestBar 加背景事件过滤
-- 移除 useDragCreate 死代码 import
-- StaffColumn 去重 data-* 属性
-- 移除调试 console.log
+## 待决定 / Pending Decisions
 
----
+- 无
 
-## 当前状态
+## 注意事项 / Notes
 
-| 功能 | 状态 |
-|------|:--:|
-| 移动重叠检测 + 红色预警 | ✅ |
-| 拉伸边界钳制 | ✅ |
-| 拖拽/拉伸防文本选中 | ✅ |
-| 拉伸松手不弹回 | ✅ |
-| 拉伸松手颜色立即恢复 | ✅ |
-| 框选（useBoxSelect） | 已有 |
-
----
-
-## 已记录问题
-
-`story/方案设计-移动重叠检测.md` §10 — 8 类问题 + 教训
-
----
-
-## 继续时
-
-1. `git checkout overlap-fix`
-2. 测试：移动/拉伸/框选 全场景验证
-3. 如通过 → merge overlap-fix to master
+- 分支: overlap-fix（已完成所有修复，待验证后合并到 main）
+- BodyRow 必须是 position: relative（GlobalGridBg 的定位锚点）+ width: max-content（sticky 子元素粘性范围）
+- HeaderRow 同理需要 width: max-content 确保 SplitCorner sticky 不消失
+- TimeCalendar.jsx 和 TableHeader.jsx 都有改动
