@@ -68,17 +68,8 @@ export async function loadHeaderStaff(headerDisplayParam, headerGroupParam, head
     }
   }
 
-  // 排序: 部门→姓名
-  var sorted = [];
-  staffMap.forEach(function(v) { sorted.push(v); });
-  sorted.sort(function(a, b) {
-    if (a.departmentName !== b.departmentName) return a.departmentName.localeCompare(b.departmentName, "zh");
-    return a.name.localeCompare(b.name, "zh");
-  });
-
-  // 重建有序 Map
-  var finalMap = new Map();
-  for (var si = 0; si < sorted.length; si++) { finalMap.set(sorted[si].accountId, sorted[si]); }
+  // 保留视图返回的记录顺序（首见部门排在前面，即工作表视图中排序靠前的部门显示在最左边）
+  var finalMap = staffMap;
 
   logs.push("【表头】完成: " + finalMap.size + " 人");
   return { staffMap: finalMap, logs: logs };
