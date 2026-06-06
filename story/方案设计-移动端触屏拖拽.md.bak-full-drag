@@ -1,0 +1,205 @@
+# 方案设计文档 — 移动端触屏拖拽支持
+
+## 1. 需求概述
+
+**目标**：在手机/平板等触屏设备上支持完整的拖拽交互——移动事件条、拉伸上下边、框选新建。当前三个 Hook（`useDragMove`、`useDragResize`、`useBoxSelect`）仅处理鼠标事件（`mousedown`/`mousemove`/`mouseup`），触屏上完全不可操作。
+
+**范围**：
+- ✅ 三个交互功能（移动/拉伸/框选）均支持触屏
+- ✅ 桌面端鼠标行为不受任何影响
+- ✅ 防止触屏默认行为（页面滚动、缩放、选中）
+- ❌ 不改动已有桌面逻辑
+- ❌ 不改动回调签名
+
+---
+
+## 2. 现状分析
+
+| 模块 | 路径 | 操作 | 说明 |
+|------|------|------|------|
+| touchUtils | `src/timeline/hooks/touchUtils.js` | **新建** | 共享工具函数：`getEventCoords`、`getTargetColumn` |
+| useDragMove | `src/timeline/hooks/useDragMove.js` | 修改 | 加 touchstart/touchmove/touchend 并行监听 |
+| useDragResize | `src/timeline/hooks/useDragResize.js` | 修改 | 同上 |
+| useBoxSelect | `src/timeline/hooks/useBoxSelect.js` | 修改 | 同上 |
+| EventBar | `src/timeline/EventBar.jsx` | 修改 | 加 `onTouchStart`、`touch-action:none`、`webkitUserSelect` |
+| StaffColumn | `src/timeline/StaffColumn.jsx` | 修改 | 加 `touch-action:none` |
+| useDragCreate | `src/timeline/hooks/useDragCreate.js` | 不改 | 死代码，未被使用 |
+
+**核心差异**：
+
+| 维度 | 鼠标 | 触屏 |
+|------|------|------|
+| 坐标来源 | `e.clientY` | `e.touches[0].clientY`（touchstart/move）、`e.changedTouches[0]`（touchend） |
+| 列检测 | `e.target.closest('[data-resource-column]')` | `document.elementFromPoint(x, y)` — touchmove 中 `e.target` 不变 |
+| 阻止默认 | 基本不需要 | `e.preventDefault()` 在 touchstart 阻止滚动/缩放，必须 `{passive:false}` |
+| 文本选中 | `userSelect:'none'` | 需额外 `webkitUserSelect:'none'` |
+| 取消事件 | `mouseleave` / `blur` | `touchcancel` 替代 mouseleave |
+
+---
+
+## 3. 架构设计
+
+```
+EventBar.jsx（事件条）
+  onMouseDown + onTouchStart → 启动交互
+  touch-action: none → 阻止浏览器手势
+       ↓
+useDragMove / useDragResize / useBoxSelect（Hooks）
+  mousedown / touchstart → 初始化 dragRef
+  ↓
+  document mousemove / touchmove → 更新预览
+    ← getEventCoords(e) → {x, y}
+    ← getTargetColumn(x, y) → [data-resource-column]
+  ↓
+  document mouseup / touchend / touchcancel → 清理 + 回调
+    ← getEventCoords(e) → {x, y}
+```
+
+**依赖方向**（单向）：
+```
+touchUtils.js（纯函数，零依赖）
+  ← useDragMove / useDragResize / useBoxSelect
+    ← EventBar（React 合成事件）
+```
+
+---
+
+## 4. 数据流
+
+### 4.1 触屏拖拽流（与鼠标并行的完整路径）
+
+```
+用户触摸事件条
+  ↓ EventBar onTouchStart
+  │   e.preventDefault() — 阻止页面滚动/缩放
+  │   ↓
+  │ useDragMove.handleMouseDown（同一函数，鼠标触屏共用）
+  │   坐标: getEventCoords(e).y — 提取触屏 clientY
+  │   ↓ 初始化 dragRef
+  │   ↓ RAF → setIsDragging(true)
+  ↓
+用户手指滑动
+  ↓ document touchmove（{passive: false}）
+  │   e.preventDefault() — 持续阻止滚动
+  │   坐标: getEventCoords(e).y
+  │   列检测: getTargetColumn(clientX, clientY)
+  │     → document.elementFromPoint(x, y)
+  │     → closest('[data-resource-column]')
+  │   ↓ 更新 dragRef + RAF → setDragState
+  ↓
+用户手指抬起
+  ↓ document touchend / touchcancel
+  │   最后一帧坐标: getEventCoords(e).y (changedTouches)
+  │   ↓ mouseup handler（同一函数，鼠标触屏共用）
+  │     → onEventDrop / reject → cleanup
+```
+
+### 4.2 getEventCoords 返回值
+
+```
+输入: MouseEvent / TouchEvent
+输出: { x: clientX, y: clientY }
+
+MouseEvent:
+  → { x: e.clientX, y: e.clientY }
+
+TouchEvent (touchstart/touchmove):
+  → { x: e.touches[0].clientX, y: e.touches[0].clientY }
+
+TouchEvent (touchend/touchcancel):
+  → { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY }
+```
+
+### 4.3 getTargetColumn 返回值
+
+```
+输入: clientX, clientY
+输出: DOM元素 | null
+
+document.elementFromPoint(x, y)
+  → 遍历祖先找 [data-resource-column]
+  → 找到 → 返回元素
+  → 未找到 → 返回 null
+```
+
+> **为什么不用 `e.target.closest`**：touchmove 事件中 `e.target` 固定为 touchstart 时的元素，不会随手指移动更新。必须用 `elementFromPoint` 实时感知手指下方的新列。
+
+---
+
+## 5. 接口定义
+
+### 5.1 新增模块
+
+| 模块 | 导出 | 职责 |
+|------|------|------|
+| `touchUtils.js` | `getEventCoords(e) → {x, y}` | 统一提取鼠标/触屏坐标 |
+| `touchUtils.js` | `getTargetColumn(x, y) → Element\|null` | 触屏列检测（elementFromPoint） |
+
+### 5.2 修改组件
+
+| 组件 | 改动点 | 影响范围 |
+|------|--------|----------|
+| **useDragMove.js** | handleMouseDown → 坐标用 `getEventCoords`；mousemove → 坐标 + `getTargetColumn` 列检测；加 touchmove/touchend/touchcancel 监听（`{passive:false}`） | 拖拽移动功能 |
+| **useDragResize.js** | 同上模式 | 拉伸调整功能 |
+| **useBoxSelect.js** | 同上模式 + userSelect 加 `webkitUserSelect` | 框选新建功能 |
+| **EventBar.jsx** | 拖拽手柄/TopHandle/BottomHandle 加 `onTouchStart`；Bar 样式加 `touch-action: none`；userSelect 加 `WebkitUserSelect` | 触屏交互启动 |
+| **StaffColumn.jsx** | StaffColWrap 加 `touch-action: none` | 列内触屏保护 |
+
+### 5.3 不变模块
+
+| 模块 | 说明 |
+|------|------|
+| `useDragCreate.js` | 死代码，不修改 |
+| `overlapScanner.js` | 纯 DOM 扫描，不涉及事件 |
+| `utils.js` | findNearestBar/snapToGrid 不变 |
+| `TimeCalendar.jsx` | 不感知鼠标/触屏差异 |
+| `App.jsx` | 零改动 |
+| `dragHandler.js` | 零改动 |
+
+---
+
+## 6. 状态管理
+
+无新增状态。触屏事件绑定到已有的 `dragRef`/`resizeRef`/`selectRef`，不新增 ref 或 state。
+
+---
+
+## 7. 边界场景
+
+| 场景 | 处理方式 |
+|------|----------|
+| 多指同时触摸 | 只取第一指 `touches[0]`，忽略其余 |
+| touchcancel（来电/系统手势中断） | 与 mouseleave 同样处理：强制 cleanup |
+| 手指滑出事件条范围 | touchmove 持续跟踪，不影响拖拽 |
+| 手指滑到另一列上方 | `elementFromPoint` 实时检测 → 更新 `newResourceId` |
+| 触屏上空白区域滚动 | 仅在有 dragRef 时 `preventDefault`；无拖拽时不阻止，保留原生滚动 |
+| iOS Safari 橡皮筋效果 | `touch-action: none` + `preventDefault` 阻止 |
+| 触屏双击缩放 | `touch-action: none` 阻止 |
+| 触屏长按选中文字 | `webkitUserSelect: 'none'` + `touch-action: none` |
+| 桌面端不受影响 | 所有改动为"并行添加"：`addEventListener('touchxxx')` 在桌面端无副作用 |
+
+---
+
+## 8. 实施步骤
+
+| 顺序 | 步骤 | 依赖 | 说明 |
+|:--:|------|:--:|------|
+| 1 | 新建 `touchUtils.js` | 无 | `getEventCoords` + `getTargetColumn` 纯函数 |
+| 2 | 修改 `useDragMove.js` | 1 | 坐标改 `getEventCoords` + 列改 `getTargetColumn` + 加 touch 监听 |
+| 3 | 修改 `useDragResize.js` | 1 | 同上 |
+| 4 | 修改 `useBoxSelect.js` | 1 | 同上 |
+| 5 | 修改 `EventBar.jsx` | 2,3 | 加 `onTouchStart` + `touch-action:none` + `webkitUserSelect` |
+| 6 | 修改 `StaffColumn.jsx` | 4 | 加 `touch-action:none` |
+| 7 | `mdye build` 编译验证 | 5,6 | 全量编译 |
+| 8 | 功能测试 | 7 | 移动/拉伸/框选 触屏全场景 |
+
+**可并行**：步骤 2-4 可同时进行（共享同一 touchUtils）。
+
+---
+
+## 9. 待确认
+
+| # | 问题 | 建议 |
+|---|------|------|
+| T1 | `userSelect` 在 iOS 上的兼容性：当前用 `document.body.style.userSelect = 'none'`，iOS Safari 需要 `webkitUserSelect = 'none'`。是否改为同时设置两者？ | 是，改 useBoxSelect + useDragMove + useDragResize 三处 |
+| T2 | `touch-action: none` 放在 `StaffColWrap` 还是全局 `document.body`？放全局会阻止页面在时间轴外的正常滚动，放列内则列内不能滚动（目前 ScrollArea 已有 overflow:auto）。 | 放 StaffColWrap 内（列级），同时 EventBar 也加 |

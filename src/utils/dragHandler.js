@@ -4,6 +4,12 @@
  */
 
 import { buildFieldValue, extractRowid, getDefaultValue, isSkipControl } from "./parseField";
+import {
+  CONTROL_TYPE_DATETIME,
+  CONTROL_TYPE_NUMBER,
+  CONTROL_TYPE_RELATION,
+  CONTROL_TYPE_DATE,
+} from "./constants";
 
 export function createDragHandler(opts) {
   var api = opts.api;
@@ -53,14 +59,14 @@ export function createDragHandler(opts) {
 
       var controls = [];
       if (beginFieldId) {
-        controls.push({ controlId: beginFieldId, type: 16, value: newStart });
+        controls.push({ controlId: beginFieldId, type: CONTROL_TYPE_DATETIME, value: newStart });
       }
       if (durationFieldId) {
-        controls.push({ controlId: durationFieldId, type: 6, value: String(duration) });
+        controls.push({ controlId: durationFieldId, type: CONTROL_TYPE_NUMBER, value: String(duration) });
       }
       if (newResourceId !== oldAccountId && operatorFieldId) {
         var sid = staffIdMap[newResourceId] || newResourceId;
-        controls.push({ controlId: operatorFieldId, type: 29, value: buildFieldValue(29, sid) });
+        controls.push({ controlId: operatorFieldId, type: CONTROL_TYPE_RELATION, value: buildFieldValue(CONTROL_TYPE_RELATION, sid) });
       }
 
       api.updateWorksheetRow({
@@ -93,10 +99,10 @@ export function createDragHandler(opts) {
 
       var controls = [];
       if (beginFieldId) {
-        controls.push({ controlId: beginFieldId, type: 16, value: newStart });
+        controls.push({ controlId: beginFieldId, type: CONTROL_TYPE_DATETIME, value: newStart });
       }
       if (durationFieldId) {
-        controls.push({ controlId: durationFieldId, type: 6, value: String(duration) });
+        controls.push({ controlId: durationFieldId, type: CONTROL_TYPE_NUMBER, value: String(duration) });
       }
 
       api.updateWorksheetRow({
@@ -124,7 +130,7 @@ export function createDragHandler(opts) {
       var controls = [];
       if (operatorFieldId) {
         var sid = staffIdMap[resourceId] || resourceId;
-        controls.push({ controlId: operatorFieldId, type: 29, value: buildFieldValue(29, sid) });
+        controls.push({ controlId: operatorFieldId, type: CONTROL_TYPE_RELATION, value: buildFieldValue(CONTROL_TYPE_RELATION, sid) });
       }
       if (beginFieldId) {
         var allCs = (controlsRef && controlsRef.current) || [];
@@ -133,10 +139,10 @@ export function createDragHandler(opts) {
         controls.push({ controlId: beginFieldId, type: bc ? bc.type : 16, value: beginVal });
       }
       if (dateFieldId && currentDate) {
-        controls.push({ controlId: dateFieldId, type: 15, value: currentDate });
+        controls.push({ controlId: dateFieldId, type: CONTROL_TYPE_DATE, value: currentDate });
       }
       if (durationFieldId) {
-        controls.push({ controlId: durationFieldId, type: 6, value: String(duration) });
+        controls.push({ controlId: durationFieldId, type: CONTROL_TYPE_NUMBER, value: String(duration) });
       } else if (endFieldId) {
         var ec = (controlsRef && controlsRef.current || []).find(function(c) { return c.controlId === endFieldId; });
         var endVal = (ec && ec.type === 46) ? end : (currentDate + " " + end.substring(0, 5) + ":00");

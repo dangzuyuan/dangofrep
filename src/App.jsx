@@ -32,6 +32,36 @@ const AppWrap = styled.div`
   font-family: ${FONT_FAMILY_SYSTEM};
 `;
 
+// Error Boundary — 防止子组件崩溃导致整个插件白屏
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error: error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return React.createElement('div', {
+        style: {
+          padding: '40px',
+          textAlign: 'center',
+          fontFamily: FONT_FAMILY_SYSTEM,
+          color: '#333',
+        }
+      },
+        React.createElement('div', { style: { fontSize: '32px', marginBottom: '16px' } }, '⚠️'),
+        React.createElement('div', { style: { fontSize: '16px', marginBottom: '8px' } }, '插件加载失败'),
+        React.createElement('div', { style: { fontSize: '12px', color: '#999' } },
+          this.state.error && this.state.error.message ? this.state.error.message : '未知错误'
+        )
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
   var envParams = env || {};
 
@@ -40,7 +70,6 @@ export default function App() {
   var timejiange = Number(envParams.timeInterval) || DEFAULT_TIME_INTERVAL;
   var rowHeader = envParams.rowHeader || DEFAULT_ROW_HEADER;
   var columnHeader = envParams.columnHeader || DEFAULT_COL_HEADER;
-  var showtitle = envParams.showtitle || "主事件";
 
   var timeFormat = "single";
   if (envParams.showstyle) {
@@ -60,25 +89,24 @@ export default function App() {
   var [showDebug, setShowDebug] = useState(false);
   var [refreshKey, setRefreshKey] = useState(0);
 
-  var [colWidth, setColWidth] = useState(function() {
-    return forceMobile ? COL_WIDTH_MOBILE : (window.innerWidth < MOBILE_BREAKPOINT ? COL_WIDTH_MOBILE : COL_WIDTH);
+  var [isMobile, setIsMobile] = useState(function() {
+    return forceMobile || window.innerWidth < MOBILE_BREAKPOINT;
   });
 
   useEffect(function() {
-    var calc = function() {
-      if (forceMobile) { setColWidth(COL_WIDTH_MOBILE); return; }
-      setColWidth(window.innerWidth < MOBILE_BREAKPOINT ? COL_WIDTH_MOBILE : COL_WIDTH);
+    if (forceMobile) return;
+    var check = function() {
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     };
-    calc();
-    window.addEventListener("resize", calc);
-    return function() { window.removeEventListener("resize", calc); };
-  }, []);
+    window.addEventListener("resize", check);
+    return function() { window.removeEventListener("resize", check); };
+  }, [forceMobile]);
 
-  var isMobile = forceMobile || colWidth === COL_WIDTH_MOBILE;
-  var axisWidth = isMobile ? 60 : AXIS_WIDTH;
-  var slotHeight = isMobile
+  var colWidth = Number(envParams.colWidth) || (isMobile ? COL_WIDTH_MOBILE : COL_WIDTH);
+  var axisWidth = Number(envParams.axisWidth) || (isMobile ? 60 : AXIS_WIDTH);
+  var slotHeight = Number(envParams.slotHeight) || (isMobile
     ? Math.max(24, (window.innerHeight * 0.6) / Math.ceil(((Number(endtime.split(":")[0]) * 60 + Number(endtime.split(":")[1])) - (Number(begintime.split(":")[0]) * 60 + Number(begintime.split(":")[1]))) / timejiange))
-    : 30;
+    : 30);
 
   var { staffMap, events, loading, logs, isSilentReload, controlsRef } =
     useDataLoader(currentDate, refreshKey);
@@ -145,6 +173,7 @@ export default function App() {
   }, [effOperatorFieldId, effBeginFieldId, effDurationFieldId, normDateFieldId, normStatusFieldId, events, handleRefresh]);
 
   return (
+    <ErrorBoundary>
     <AppWrap>
       <Toolbar
         currentDate={currentDate}
@@ -156,7 +185,7 @@ export default function App() {
         onToggleDebug={function() { setShowDebug(!showDebug); }}
         isMobile={isMobile}
         staffLabel={columnHeader}
-        bookingLabel={showtitle}
+        bookingLabel={columnHeader}
         onRefresh={handleRefresh}
       />
       <TimeCalendar
@@ -179,5 +208,6 @@ export default function App() {
       />
       {showDebug && <DebugPanel logs={logs} />}
     </AppWrap>
+    </ErrorBoundary>
   );
 }

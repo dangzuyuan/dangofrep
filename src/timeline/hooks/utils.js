@@ -30,6 +30,7 @@ export function findNearestBar(resourceId, direction, proposedMin, originalBound
   var cRect = container.getBoundingClientRect();
   var bars = container.querySelectorAll('[data-event-bar]');
   for (var i = 0; i < bars.length; i++) {
+    if (bars[i].dataset.isBackground === 'true') continue;
     var br = bars[i].getBoundingClientRect();
     if (direction === 'bottom') {
       var barTop = pixelToMinutes(br.top - cRect.top, containerHeight, totalMinutes);

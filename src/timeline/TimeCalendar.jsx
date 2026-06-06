@@ -4,8 +4,10 @@ import TimelineAxis from './TimelineAxis';
 import TableHeader from './TableHeader';
 import StaffColumn from './StaffColumn';
 import EventBar from './EventBar';
-import { useDragMove, useDragResize } from './hooks/useDrag';
+import { useDragMove } from './hooks/useDragMove';
+import { useDragResize } from './hooks/useDragResize';
 import { useBoxSelect } from './hooks/useBoxSelect';
+import { useTouchCreate } from './hooks/useTouchCreate';
 import { calculateEventLayout } from './hooks/eventLayout';
 
 const AppContainer = styled.div`
@@ -48,10 +50,9 @@ const BodyRow = styled.div`
   display: flex;
   position: relative;
   flex-shrink: 0;
-  width: max-content;  /* 使用 max-content 确保宽度由子元素决定 */
-  min-width: 100%;     /* 至少占满容器宽度 */
-  
-  /* 兼容性处理 */
+  width: max-content;  /* max-content 确保 sticky 子元素有足够的粘性范围 */
+  min-width: 100%;
+
   @supports not (width: max-content) {
     width: fit-content;
   }
@@ -74,8 +75,8 @@ const BodyAxisCell = styled.div`
   min-width: ${(props) => props.axisWidth}px;
   position: sticky;
   left: 0;
-  z-index: 1;
-  background: rgba(250, 250, 250, 0.8);  /* 半透明背景 */
+  z-index: 6;
+  background: #fafafa;  /* 完全不透明背景，防止横向滚动时右侧内容透过 */
   border-right: 1px solid #e8e8e8;
   flex-shrink: 0;
 `;
@@ -126,15 +127,21 @@ export default function TimeCalendar({
     // 直接使用已标准化的 startTime/endTime（纯时间字符串）
     const [sh, sm] = begintime.split(":").map(Number);
     const startMinTotal = sh * 60 + sm;
-    
+    const [eh, em] = endtime.split(":").map(Number);
+    const endMinTotal = eh * 60 + em;
+
     const [startH, startM] = ev.startTime.split(':').map(Number);
     const [endH, endM] = ev.endTime.split(':').map(Number);
-    
+
     const evStartMin = startH * 60 + startM;
     const evEndMin = endH * 60 + endM;
-    
-    const top = ((evStartMin - startMinTotal) / timeMeta.totalMin) * 100;
-    const height = ((evEndMin - evStartMin) / timeMeta.totalMin) * 100;
+
+    // 钳制到时间轴范围，防止背景条/主事件条超出时间轴边界
+    const clampedStart = Math.max(evStartMin, startMinTotal);
+    const clampedEnd = Math.min(evEndMin, endMinTotal);
+
+    const top = ((clampedStart - startMinTotal) / timeMeta.totalMin) * 100;
+    const height = ((clampedEnd - clampedStart) / timeMeta.totalMin) * 100;
     return { top, height };
   };
 
@@ -161,6 +168,13 @@ export default function TimeCalendar({
   });
 
   const { handleSelectStart, isSelecting, selectState } = useBoxSelect({
+    onSelectSlot,
+    begintime,
+    endtime,
+    timejiange
+  });
+
+  const { handleTouchStart, isCreating, createState } = useTouchCreate({
     onSelectSlot,
     begintime,
     endtime,
@@ -246,6 +260,7 @@ export default function TimeCalendar({
                 data-resource-column
                 data-resource-id={s.id || s.accountId}
                 onMouseDown={(e) => handleSelectStart(e, s.id || s.accountId)}
+                onTouchStart={(e) => handleTouchStart(e, s.id || s.accountId)}
               >
                 {/* 空状态提示 */}
                 {staffEvents.length === 0 && (
@@ -269,6 +284,9 @@ export default function TimeCalendar({
                 {isSelecting && selectState && (selectState.resourceId === s.id || selectState.resourceId === s.accountId) && (
                   <div style={{position:'absolute',top:(selectState.startMin/timeMeta.totalMin)*100+'%',height:((selectState.endMin-selectState.startMin)/timeMeta.totalMin)*100+'%',left:0,right:0,backgroundColor:'rgba(24,144,255,0.15)',border:'2px dashed #1890ff',borderRadius:4,zIndex:5,pointerEvents:'none'}}/>
                 )}
+                {isCreating && createState && (createState.resourceId === s.id || createState.resourceId === s.accountId) && (
+                  <div style={{position:'absolute',top:(createState.startMin/timeMeta.totalMin)*100+'%',height:((createState.endMin-createState.startMin)/timeMeta.totalMin)*100+'%',left:0,right:0,backgroundColor:'rgba(24,144,255,0.15)',border:'2px solid #1890ff',borderRadius:4,zIndex:5,pointerEvents:'none'}}/>
+                )}
                 {staffEvents.map((ev, evIdx) => {
                   let { top, height } = getEventPosition(ev);
                   
@@ -286,9 +304,9 @@ export default function TimeCalendar({
                     height = previewHeight;
                   }
                   
-                  // 如果正在拉伸此事件，使用预览位置
-                  const isResizing = resizeState && resizeState.eventId === ev.id;
-                  if (isResizing) {
+                  // 如果正在拉伸此事件，使用预览位置（含 _final 阶段）
+                  var hasPendingResize = resizeState && resizeState.eventId === ev.id;
+                  if (hasPendingResize) {
                     const [sh, sm] = begintime.split(":").map(Number);
                     const startMinTotal = sh * 60 + sm;
                     const previewTop = ((resizeState.previewStartMin - startMinTotal) / timeMeta.totalMin) * 100;
@@ -296,6 +314,8 @@ export default function TimeCalendar({
                     top = previewTop;
                     height = previewHeight;
                   }
+                  
+                  var isResizing = hasPendingResize && !resizeState._final;
                   
                   return (
                     <EventBar 
@@ -308,6 +328,7 @@ export default function TimeCalendar({
                       isDragging={isDragging}  // 传递拖拽状态
                       isResizing={isResizing}  // 传递拉伸状态
                       isSelected={selectedEventId === ev.id}  // 传递选中状态
+                      isOverlapping={moveDragState && moveDragState.eventId === ev.id && moveDragState.isOverlapping}
                       layoutLeft={layout.left}
                       layoutWidth={layout.width}
                       onDragStart={(e) => handleDragStart(e, ev, s.id || s.accountId)}
@@ -331,6 +352,7 @@ export default function TimeCalendar({
                     color="#1890ff"
                     isDragging={true}
                     isResizing={false}
+                    isOverlapping={moveDragState && moveDragState.isOverlapping}
                   />
                 )}
             </StaffColumn>

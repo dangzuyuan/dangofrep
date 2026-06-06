@@ -62,6 +62,7 @@ export default function EventBar({
   isDragging = false,  // 是否正在拖拽
   isResizing = false,  // 是否正在拉伸
   isSelected = false,  // 是否被选中
+  isOverlapping = false,
   layoutLeft = 0,      // 水平偏移百分比（0-100）
   layoutWidth = 100,   // 宽度百分比（0-100）
   onDragStart,
@@ -92,6 +93,8 @@ export default function EventBar({
     return (
       <Bar
         data-event-bar
+        data-event-id={ev.id || ev._rowid}
+        data-is-background="true"
         style={{
           top: `${top}%`,
           height: `${height}%`,
@@ -128,6 +131,8 @@ export default function EventBar({
   return (
     <Bar
       data-event-bar
+      data-event-id={ev.id || ev._rowid}
+      data-is-background="false"
       onClick={handleBarClick}
       onMouseUp={handleBarClick}
       onMouseDownCapture={handleMouseDown}
@@ -136,13 +141,13 @@ export default function EventBar({
         height: `${height}%`,
         left: `${layoutLeft}%`,
         width: `${layoutWidth}%`,
-        backgroundColor: isDragging || isResizing ? `${color}80` : (isSelected ? `${color}cc` : color),  // 选中时稍微透明
-        border: isDragging || isResizing ? '2px dashed #fff' : (isSelected ? '2px solid #fff' : 'none'),  // 选中时白色实线边框
-        opacity: isDragging || isResizing ? 0.7 : 1,  // 拖拽时降低透明度
+        backgroundColor: isOverlapping ? '#ff4d4f80' : (isDragging || isResizing ? `${color}80` : (isSelected ? `${color}cc` : color)),
+        border: isOverlapping ? '2px dashed #ff4d4f' : (isDragging || isResizing ? '2px dashed #fff' : (isSelected ? '2px solid #fff' : 'none')),
+        opacity: isDragging || isResizing ? 0.7 : 1,
         pointerEvents: 'auto',
-        zIndex: isDragging || isResizing ? 10 : (ev.layoutZIndex || 3),  // 拖拽时提高层级，否则使用布局 zIndex
-        boxShadow: isDragging || isResizing ? '0 4px 12px rgba(0, 0, 0, 0.3)' : (isSelected ? '0 0 0 2px rgba(255, 255, 255, 0.8), 0 4px 12px rgba(0, 0, 0, 0.2)' : 'none'),  // 选中时外发光+阴影
-        transition: isDragging || isResizing ? 'none' : 'transform 0.12s ease, box-shadow 0.12s ease',  // 拖拽时禁用过渡
+        zIndex: isDragging || isResizing ? 10 : (ev.layoutZIndex || 3),
+        boxShadow: isOverlapping ? '0 0 0 2px #ff4d4f' : (isDragging || isResizing ? '0 4px 12px rgba(0, 0, 0, 0.3)' : (isSelected ? '0 0 0 2px rgba(255, 255, 255, 0.8), 0 4px 12px rgba(0, 0, 0, 0.2)' : 'none')),
+        transition: isDragging || isResizing ? 'none' : 'transform 0.12s ease, box-shadow 0.12s ease',
         ...extraStyle
       }}
     >

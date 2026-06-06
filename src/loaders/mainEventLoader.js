@@ -58,6 +58,7 @@ export async function loadMainEvents(mainDateParam, mainBeginParam, mainEndParam
     }
 
     if (!staffInfo && accountId) {
+      mu++;
       mainStaffMapResult.set(accountId, {
         accountId: accountId, name: matchName || (displayVal ? displayVal.text : ""), departmentId: "", departmentName: "未分组",
       });

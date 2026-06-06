@@ -114,6 +114,18 @@ export const FILTER_DATE_RANGE_TYPE = 3;
 export const DEFAULT_CONTROL_TYPE = 1;
 export const STATIC_VALUE_TYPE = 0;
 
+// 明道云字段类型编号（用于 dragHandler/parseField 写入值组装）
+export const CONTROL_TYPE_TEXT = 2;
+export const CONTROL_TYPE_NUMBER = 6;
+export const CONTROL_TYPE_DATE = 15;
+export const CONTROL_TYPE_DATETIME = 16;
+export const CONTROL_TYPE_RELATION = 29;
+export const CONTROL_TYPE_MEMBER = 26;
+export const CONTROL_TYPE_DEPT = 27;
+export const CONTROL_TYPE_OPTIONS = 9;
+export const CONTROL_TYPE_MULTI_OPTIONS = 10;
+export const CONTROL_TYPE_CHECKBOX = 11;
+
 // ---------- 默认颜色 ----------
 export const DEFAULT_EVENT_COLOR = "#1890ff";
 export const DEFAULT_OPERATE_COLOR = "#2196F3";

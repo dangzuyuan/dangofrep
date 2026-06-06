@@ -27,13 +27,12 @@ export default function StaffColumn({
     <StaffColWrap
       data-staff-idx={idx}
       data-accountid={staff.accountId}
-      data-resource-column=""  // 添加空属性用于标识
-      data-resource-id={staff.accountId}  // 添加 resourceId
       style={{ 
         height: rowHeight, 
         width: colWidth, 
         minWidth: colWidth, 
-        maxWidth: colWidth 
+        maxWidth: colWidth,
+        touchAction: 'manipulation'
       }}
       {...restProps}  // 传递其他 props
     >

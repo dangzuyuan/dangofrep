@@ -9,6 +9,12 @@ const HeaderRow = styled.div`
   background: #fff;
   border-bottom: 1px solid #e8e8e8;
   flex-shrink: 0;
+  width: max-content;
+  min-width: 100%;
+
+  @supports not (width: max-content) {
+    width: fit-content;
+  }
 `;
 
 const SplitCorner = styled.div`
