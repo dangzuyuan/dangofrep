@@ -63,9 +63,7 @@ export function buildDepartmentTree(resources) {
 
   // 保留 resources 数组的首次出现顺序（由 headerLoader 按视图排序确定）
   // 部门顺序 = 视图数据中各部门首次出现的顺序 → 显示在表头最左边的部门 = 视图中排序靠前的部门
-  tree.forEach(function(dept) {
-    dept.children.sort(function(a, b) { return a.accountId.localeCompare(b.accountId); });
-  });
+  // 部门内人员顺序 = resources 中首次出现的顺序 → 与列体顺序完全一致
 
   return tree;
 }
