@@ -83,11 +83,19 @@ export default function App() {
   var forceMobile = envParams.forceMobile === "true" || envParams.forceMobile === "1";
 
   var [currentDate, setCurrentDate] = useState(function() {
+    // 明道云"刷新视图"会销毁并重建整个组件树，React state 全部丢失
+    // 用 sessionStorage 曲线救国：记住用户选的日期，重建时恢复
+    try { var sd = sessionStorage.getItem("__booking_date__"); if (sd) return sd; } catch (e) {}
     var d = new Date();
     return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
   });
   var [showDebug, setShowDebug] = useState(false);
   var [refreshKey, setRefreshKey] = useState(0);
+
+  // 每次日期变化同步写入 sessionStorage
+  useEffect(function() {
+    try { sessionStorage.setItem("__booking_date__", currentDate); } catch (e) {}
+  }, [currentDate]);
 
   var [isMobile, setIsMobile] = useState(function() {
     return forceMobile || window.innerWidth < MOBILE_BREAKPOINT;
