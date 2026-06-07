@@ -1,14 +1,13 @@
 # Session Handoff / 会话接续
 
-> 最后更新: 2026-06-06 08:15
-> Last updated: 2026-06-06 08:15
+> 最后更新: 2026-06-07 11:15
+> Last updated: 2026-06-07 11:15
 
 ## 刚刚完成 / Just Completed
 
-- 修复横向滚动时间轴遮挡与锚定区消失问题（3项改动）：
-  1. BodyAxisCell z-index: 1→6 + background 改为不透明 #fafafa（防止事件条透过半透明背景）
-  2. getEventPosition 事件起止时间钳制到 begintime~endtime 范围（防止溢出时间轴）
-  3. HeaderRow + BodyRow 统一 width: max-content; min-width: 100%（sticky left:0 子元素粘性范围覆盖全部内容）
+- 修复框选新建员工错位：去掉 `dept.children.sort(按 accountId)`，部门内人员顺序与列体完全对齐
+- 部门排序改为视图返回顺序：`headerLoader` + `adapters` 均保留首次出现顺序，不再按拼音排序
+- 整理输出最新设计方案文档 `story/设计方案-最新.md`（合并了所有旧方案文档）
 
 ## 正在进行 / In Progress
 
@@ -16,17 +15,17 @@
 
 ## 下一步 / Next Steps
 
-1. 在明道云容器内测试横向滚动：锚定区(SplitCorner)和时间轴(BodyAxisCell)是否始终固定不消失
-2. 测试事件条是否不再超出时间轴边界
-3. 测试半透明背景事件条是否不再透过时间轴
+1. 测试框选新建：在任意员工列划动，确认新事件创建到正确的员工
+2. 测试部门顺序：在明道云视图中调整排序规则，确认表头部门显示顺序随之变化
+3. 全功能回归测试
 
 ## 待决定 / Pending Decisions
 
-- 无
+- /v3/departments/lookup 精确获取拖拽部门顺序：已确认不可行（插件环境无 HAP-Appkey/SecretKey），改为视图排序方案
 
 ## 注意事项 / Notes
 
-- 分支: overlap-fix（已完成所有修复，待验证后合并到 main）
-- BodyRow 必须是 position: relative（GlobalGridBg 的定位锚点）+ width: max-content（sticky 子元素粘性范围）
-- HeaderRow 同理需要 width: max-content 确保 SplitCorner sticky 不消失
-- TimeCalendar.jsx 和 TableHeader.jsx 都有改动
+- 分支: overlap-fix
+- `adapters.js` 中 `buildDepartmentTree` 的两个 sort 已全部移除（部门间 + 部门内人员）
+- `headerLoader.js` 的拼音排序 + 重建 Map 逻辑已移除
+- 表头人员标签顺序 = 列体 resources 顺序 = staffMap 遍历顺序 = 视图返回顺序
