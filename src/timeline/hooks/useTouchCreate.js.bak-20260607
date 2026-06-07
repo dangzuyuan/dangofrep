@@ -3,8 +3,7 @@ import { pixelToMinutes, snapToGrid } from './utils';
 
 export function useTouchCreate({ onSelectSlot, begintime, endtime, timejiange, maxSlots }) {
   var MAX_SLOTS = maxSlots || 8;
-  var HOLD_MS = 500;           // 长按500ms才激活（防误触）
-  var MOVE_CANCEL_PX = 10;     // 300ms内移动超过10px→取消（认为是滚动）
+  var HOLD_MS = 300;
 
   var [isCreating, setIsCreating] = useState(false);
   var [createState, setCreateState] = useState(null);
@@ -51,7 +50,6 @@ export function useTouchCreate({ onSelectSlot, begintime, endtime, timejiange, m
 
     touchRef.current = {
       resourceId: resourceId,
-      startClientX: touch.clientX,
       startClientY: touch.clientY,
       containerHeight: rect.height,
       totalMinutes: totalMin,
@@ -83,23 +81,11 @@ export function useTouchCreate({ onSelectSlot, begintime, endtime, timejiange, m
 
   useEffect(function() {
     var handleTouchMove = function(e) {
-      if (!touchRef.current) return;
+      if (!touchRef.current || !touchRef.current.active) return;
       if (!e.touches || !e.touches.length) return;
+      e.preventDefault();
 
       var t = touchRef.current;
-
-      // 未激活前：检测移动距离，超过阈值则取消（防轻触滑动误触）
-      if (!t.active) {
-        var touch = e.touches[0];
-        var dx = touch.clientX - t.startClientX;
-        var dy = touch.clientY - t.startClientY;
-        if (Math.abs(dx) > MOVE_CANCEL_PX || Math.abs(dy) > MOVE_CANCEL_PX) {
-          cleanup();
-        }
-        return;
-      }
-
-      e.preventDefault();
       var touch = e.touches[0];
       var dy = touch.clientY - t.startClientY;
 
