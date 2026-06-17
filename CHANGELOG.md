@@ -3,6 +3,11 @@
 ## 2026-06-17
 
 - 修复移动端时间轴滑动：固定定位+阻断滚动链
+- 修复iOS时间轴滑动与表头对齐：webkit惯性滚动+显式宽度
+- V7 iOS专属修复：enabled gate + iOS检测隔离Android，零影响
+  - 新建 useScrollLock.js：方向锁定 + rAF 惯性动画
+  - className .ios-scroll-area：padding-left: 40px 避开 iOS 侧滑敏感区
+  - Android 完全不触发任何新增代码
 
 ## 2026-06-07
 

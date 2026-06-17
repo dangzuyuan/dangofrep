@@ -200,6 +200,8 @@ export default function TimeCalendar({
   return (
     <AppContainer>
       <ScrollArea ref={scrollRef} className={isIOS ? 'ios-scroll-area' : ''} onClick={handleBackgroundClick}>
+        {/* iOS 专属：左侧透明遮罩拦截边缘触摸，防止系统侧滑返回抢占 */}
+        {isIOS && <div className="ios-edge-mask" />}
         <TableHeader
           departmentTree={departmentTree}
           columnHeader={columnHeader}

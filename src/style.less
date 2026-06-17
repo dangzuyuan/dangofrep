@@ -3,6 +3,38 @@ html, body {
     font-family: Helvetica, 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
     overscroll-behavior-x: none;  /* 页面级禁止横向过度滚动，防止横向手势触发宿主页面操作 */
 }
+/* iOS 专属：锁定根容器为 fixed 全屏，阻断 WKWebView 橡皮筋 */
+body.ios-app {
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+}
+body.ios-app #app {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    transform: translateZ(0);      /* 独立合成层，WKWebView 无法劫持 */
+}
+/* iOS 专属：时间轴左内边距避开 30px 系统侧滑敏感区 */
+body.ios-app .ios-scroll-area {
+    padding-left: 42px;
+    transform: translateZ(1px);    /* GPU 合成层，减少 1 帧渲染延迟 */
+}
+/* iOS 专属：左侧透明遮罩拦截边缘触摸 */
+.ios-edge-mask {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 42px;
+    z-index: 20;
+    background: transparent;
+    pointer-events: auto;         /* 拦截触摸，阻止穿透到页面级 */
+}
 * {
     box-sizing: border-box;
 }
