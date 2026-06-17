@@ -28,6 +28,7 @@ const ScrollArea = styled.div`
   touch-action: pan-x pan-y;           /* 声明此元素处理触摸滚动，阻止浏览器手势冒泡到页面 */
   overscroll-behavior-x: contain;      /* 横向滚到边界不再传递到父级，阻断滚动链 */
   overscroll-behavior-y: contain;      /* 纵向滚到边界不再传递到父级 */
+  -webkit-overflow-scrolling: touch;  /* iOS WKWebView 启用触摸惯性滚动 */
   
   /* 自定义滚动条样式 */
   scrollbar-width: thin;  /* Firefox */
@@ -55,12 +56,8 @@ const BodyRow = styled.div`
   display: flex;
   position: relative;
   flex-shrink: 0;
-  width: max-content;  /* max-content 确保 sticky 子元素有足够的粘性范围 */
+  width: ${(p) => p.$totalWidth}px;       /* 显式像素宽度，iOS Safari 对齐表头 */
   min-width: 100%;
-
-  @supports not (width: max-content) {
-    width: fit-content;
-  }
 `;
 
 // 全局网格背景（覆盖时间轴 + 所有资源列）
@@ -197,15 +194,16 @@ export default function TimeCalendar({
   return (
     <AppContainer>
       <ScrollArea onClick={handleBackgroundClick}>
-        <TableHeader 
+        <TableHeader
           departmentTree={departmentTree}
           columnHeader={columnHeader}
           rowHeader={rowHeader}
           columnsWidth={columnsWidth}
           colWidth={colWidth}
           axisWidth={axisWidth}
+          totalWidth={totalWidth}
         />
-        <BodyRow style={{ height: calculatedRowHeight }}>
+        <BodyRow style={{ height: calculatedRowHeight }} $totalWidth={totalWidth}>
           {/* 全局网格背景 */}
           <GlobalGridBg totalWidth={totalWidth} style={{ background: gridBg }} />
           

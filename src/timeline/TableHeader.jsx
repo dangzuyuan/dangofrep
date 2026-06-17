@@ -9,12 +9,8 @@ const HeaderRow = styled.div`
   background: #fff;
   border-bottom: 1px solid #e8e8e8;
   flex-shrink: 0;
-  width: max-content;
+  width: ${(p) => p.$totalWidth}px;       /* 显式像素宽度，与 BodyRow 保持一致 */
   min-width: 100%;
-
-  @supports not (width: max-content) {
-    width: fit-content;
-  }
 `;
 
 const SplitCorner = styled.div`
@@ -100,17 +96,18 @@ const StaffCell = styled.div`
   box-sizing: border-box;
 `;
 
-export default function TableHeader({ 
-  departmentTree = [], 
-  columnHeader = "时间", 
-  rowHeader = "人员", 
-  columnsWidth = 0, 
+export default function TableHeader({
+  departmentTree = [],
+  columnHeader = "时间",
+  rowHeader = "人员",
+  columnsWidth = 0,
   colWidth = 72,
-  axisWidth = 80 
+  axisWidth = 80,
+  totalWidth = 0
 }) {
   if (!departmentTree || departmentTree.length === 0) {
     return (
-      <HeaderRow>
+      <HeaderRow $totalWidth={totalWidth}>
         <SplitCorner axisWidth={axisWidth}>
           <CornerTop>{columnHeader}</CornerTop>
           <CornerBottom>{rowHeader}</CornerBottom>
@@ -127,7 +124,7 @@ export default function TableHeader({
   }
 
   return (
-    <HeaderRow>
+    <HeaderRow $totalWidth={totalWidth}>
       <SplitCorner axisWidth={axisWidth}>
         <CornerTop>{columnHeader}</CornerTop>
         <CornerBottom>{rowHeader}</CornerBottom>
