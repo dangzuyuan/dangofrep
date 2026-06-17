@@ -16,6 +16,8 @@ const AppContainer = styled.div`
   display: flex;
   flex-direction: column;
   background: #fff;
+  overflow: hidden;              /* 防止插件内容溢出触发宿主页面滚动 */
+  overscroll-behavior: none;     /* 彻底阻断滚动链到明道云宿主页面 */
 `;
 
 const ScrollArea = styled.div`
@@ -23,6 +25,9 @@ const ScrollArea = styled.div`
   overflow: auto;  /* 同时支持横向和纵向滚动 */
   position: relative;
   min-height: 0;
+  touch-action: pan-x pan-y;           /* 声明此元素处理触摸滚动，阻止浏览器手势冒泡到页面 */
+  overscroll-behavior-x: contain;      /* 横向滚到边界不再传递到父级，阻断滚动链 */
+  overscroll-behavior-y: contain;      /* 纵向滚到边界不再传递到父级 */
   
   /* 自定义滚动条样式 */
   scrollbar-width: thin;  /* Firefox */
