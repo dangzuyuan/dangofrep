@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import TimelineAxis from './TimelineAxis';
 import TableHeader from './TableHeader';
@@ -8,6 +8,7 @@ import { useDragMove } from './hooks/useDragMove';
 import { useDragResize } from './hooks/useDragResize';
 import { useBoxSelect } from './hooks/useBoxSelect';
 import { useTouchCreate } from './hooks/useTouchCreate';
+import { useScrollLock } from './hooks/useScrollLock';
 import { calculateEventLayout } from './hooks/eventLayout';
 
 const AppContainer = styled.div`
@@ -183,6 +184,11 @@ export default function TimeCalendar({
     timejiange
   });
 
+  // iOS 专属方向锁定：Android 跳过，零影响
+  var isIOS = /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
+  const scrollRef = useRef(null);
+  useScrollLock(scrollRef, isIOS);
+
   // 点击空白区域取消选中
   const handleBackgroundClick = (e) => {
     // 如果点击的是背景区域（不是事件条），则取消选中
@@ -193,7 +199,7 @@ export default function TimeCalendar({
 
   return (
     <AppContainer>
-      <ScrollArea onClick={handleBackgroundClick}>
+      <ScrollArea ref={scrollRef} className={isIOS ? 'ios-scroll-area' : ''} onClick={handleBackgroundClick}>
         <TableHeader
           departmentTree={departmentTree}
           columnHeader={columnHeader}
