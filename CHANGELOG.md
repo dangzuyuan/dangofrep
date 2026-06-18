@@ -1,13 +1,19 @@
 # CHANGELOG
 
-## 2026-06-17
+## 2026-06-18
 
 - 修复移动端时间轴滑动：固定定位+阻断滚动链
 - 修复iOS时间轴滑动与表头对齐：webkit惯性滚动+显式宽度
 - V7 iOS专属修复：enabled gate + iOS检测隔离Android，零影响
-  - 新建 useScrollLock.js：方向锁定 + rAF 惯性动画
-  - className .ios-scroll-area：padding-left: 40px 避开 iOS 侧滑敏感区
-  - Android 完全不触发任何新增代码
+- **V8 工业级**：iOS/Android 双分支滑动，全局守卫+fixed容器+边缘遮罩
+  - useScrollLock.js 内置 iOS/Android 双分支常量与逻辑
+  - iOS: touchstart 立即挂载 document 全局捕获守卫，rAF 动量动画
+  - Android: 仅方向判定 + preventDefault，原生 overflow 滚动不动
+  - index.js: iOS 写 body.ios-app class
+  - style.less: body.ios-app #app fixed + .ios-scroll-area padding-left:42px + transform
+  - TimeCalendar.jsx: iOS 专属 42px 透明边缘遮罩，拦截系统侧滑返回触摸
+
+## 2026-06-17
 
 ## 2026-06-07
 
