@@ -16,7 +16,7 @@ const AppContainer = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: ${(p) => p.$bgColor || '#fff'};
+  background: #fff;
   overflow: hidden;
   overscroll-behavior: none;
 `;
@@ -26,7 +26,7 @@ const ScrollArea = styled.div`
   overflow: auto;
   position: relative;
   min-height: 0;
-  background: ${(p) => p.$bgColor || '#fff'};
+  background: ${(p) => p.$tableBgColor || '#fff'};
   touch-action: pan-x pan-y;
   overscroll-behavior-x: contain;
   overscroll-behavior-y: contain;
@@ -80,7 +80,7 @@ const BodyAxisCell = styled.div`
   position: sticky;
   left: 0;
   z-index: 6;
-  background: ${(p) => p.$bgColor || '#fafafa'};  /* 动态背景色，不完全透明防止横向滚动时右侧内容透过 */
+  background: ${(p) => p.$subBgColor || '#fafafa'};  /* 子区域背景色（时间轴/表头/锚定区） */
   border-right: 1px solid #e8e8e8;
   flex-shrink: 0;
 `;
@@ -101,6 +101,7 @@ export default function TimeCalendar({
   selectedEventId = null,  // 选中的事件 ID
   // 外观配置
   backgroundColor = "",
+  subBackgroundColor = "",
   mainFontSize = 0,
   // 交互回调
   onEventClick,
@@ -195,6 +196,7 @@ export default function TimeCalendar({
 
   // DEBUG
   console.log('[DEBUG TimeCalendar] backgroundColor:', JSON.stringify(backgroundColor));
+  console.log('[DEBUG TimeCalendar] subBackgroundColor:', JSON.stringify(subBackgroundColor));
   console.log('[DEBUG TimeCalendar] mainFontSize:', mainFontSize);
 
   // 点击空白区域取消选中
@@ -206,8 +208,8 @@ export default function TimeCalendar({
   };
 
   return (
-    <AppContainer $bgColor={backgroundColor}>
-      <ScrollArea ref={scrollRef} className={isIOS ? 'ios-scroll-area' : ''} $bgColor={backgroundColor} onClick={handleBackgroundClick}>
+    <AppContainer>
+      <ScrollArea ref={scrollRef} className={isIOS ? 'ios-scroll-area' : ''} $tableBgColor={backgroundColor} onClick={handleBackgroundClick}>
         {/* iOS 专属：左侧透明遮罩拦截边缘触摸，防止系统侧滑返回抢占 */}
         {isIOS && <div className="ios-edge-mask" />}
         <TableHeader
@@ -218,7 +220,7 @@ export default function TimeCalendar({
           colWidth={colWidth}
           axisWidth={axisWidth}
           totalWidth={totalWidth}
-          bgColor={backgroundColor}
+          bgColor={subBackgroundColor}
         />
         <BodyRow style={{ height: calculatedRowHeight }} $totalWidth={totalWidth}>
           {/* 全局网格背景 */}
@@ -245,7 +247,7 @@ export default function TimeCalendar({
             </div>
           )}
           
-          <BodyAxisCell axisWidth={axisWidth} $bgColor={backgroundColor} style={{ height: calculatedRowHeight }}>
+          <BodyAxisCell axisWidth={axisWidth} $subBgColor={subBackgroundColor} style={{ height: calculatedRowHeight }}>
             <TimelineAxis 
               begintime={begintime}
               endtime={endtime}

@@ -28,7 +28,7 @@ const AppWrap = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: ${(p) => p.$bgColor || COLOR_WHITE};
+  background: ${COLOR_WHITE};
   font-family: ${FONT_FAMILY_SYSTEM};
 `;
 
@@ -70,14 +70,17 @@ export default function App() {
   var timejiange = Number(envParams.timeInterval) || DEFAULT_TIME_INTERVAL;
   var rowHeader = envParams.rowHeader || DEFAULT_ROW_HEADER;
   var columnHeader = envParams.columnHeader || DEFAULT_COL_HEADER;
-  var backgroundColor = envParams.backgroundcolor || envParams.backgroupcolor || "";
+  var backgroundColor = envParams.backgroundcolor || "";
+  var subBackgroundColor = envParams.subbackgroundcolor || "";
   var mainFontSize = Number(envParams.mainfontsize) || 0;
 
   // DEBUG: 打印 env 参数排查背景色不生效
   console.log('[DEBUG] envParams keys:', Object.keys(envParams));
   console.log('[DEBUG] envParams.backgroundcolor:', JSON.stringify(envParams.backgroundcolor));
+  console.log('[DEBUG] envParams.subbackgroundcolor:', JSON.stringify(envParams.subbackgroundcolor));
   console.log('[DEBUG] envParams.mainfontsize:', JSON.stringify(envParams.mainfontsize));
   console.log('[DEBUG] backgroundColor resolved:', JSON.stringify(backgroundColor));
+  console.log('[DEBUG] subBackgroundColor resolved:', JSON.stringify(subBackgroundColor));
   console.log('[DEBUG] mainFontSize resolved:', mainFontSize);
 
   var timeFormat = "single";
@@ -191,7 +194,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-    <AppWrap $bgColor={backgroundColor}>
+    <AppWrap>
       <Toolbar
         currentDate={currentDate}
         onDateChange={setCurrentDate}
@@ -223,6 +226,7 @@ export default function App() {
         onEventResize={dragHandlers.onEventResize}
         onSelectSlot={dragHandlers.onSelectSlot}
         backgroundColor={backgroundColor}
+        subBackgroundColor={subBackgroundColor}
         mainFontSize={mainFontSize}
       />
       {showDebug && <DebugPanel logs={logs} />}

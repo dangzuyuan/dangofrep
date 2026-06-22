@@ -6,7 +6,7 @@ const HeaderRow = styled.div`
   position: sticky;
   top: 0;
   z-index: 10;
-  background: ${(p) => p.$bgColor || '#fff'};
+  background: ${(p) => p.$subBgColor || '#fff'};
   border-bottom: 1px solid #e8e8e8;
   flex-shrink: 0;
   width: ${(p) => p.$totalWidth}px;       /* 显式像素宽度，与 BodyRow 保持一致 */
@@ -19,7 +19,7 @@ const SplitCorner = styled.div`
   position: sticky;
   left: 0;
   z-index: 11;
-  background: ${(p) => p.$bgColor || '#fafafa'};
+  background: ${(p) => p.$subBgColor || '#fafafa'};
   display: grid;
   grid-template-rows: 1fr 1fr;
   border-right: 1px solid #e8e8e8;
@@ -78,7 +78,7 @@ const DeptCell = styled.div`
 
 const StaffRow = styled.div`
   display: flex;
-  background: ${(p) => p.$bgColor || '#fff'};
+  background: ${(p) => p.$subBgColor || '#fff'};
   border-bottom: 1px solid #e8e8e8;
   overflow: hidden;
   flex-shrink: 0;
@@ -108,8 +108,8 @@ export default function TableHeader({
 }) {
   if (!departmentTree || departmentTree.length === 0) {
     return (
-      <HeaderRow $totalWidth={totalWidth} $bgColor={bgColor}>
-        <SplitCorner axisWidth={axisWidth} $bgColor={bgColor}>
+      <HeaderRow $totalWidth={totalWidth} $subBgColor={bgColor}>
+        <SplitCorner axisWidth={axisWidth} $subBgColor={bgColor}>
           <CornerTop>{columnHeader}</CornerTop>
           <CornerBottom>{rowHeader}</CornerBottom>
         </SplitCorner>
@@ -125,8 +125,8 @@ export default function TableHeader({
   }
 
   return (
-    <HeaderRow $totalWidth={totalWidth} $bgColor={bgColor}>
-      <SplitCorner axisWidth={axisWidth} $bgColor={bgColor}>
+    <HeaderRow $totalWidth={totalWidth} $subBgColor={bgColor}>
+      <SplitCorner axisWidth={axisWidth} $subBgColor={bgColor}>
         <CornerTop>{columnHeader}</CornerTop>
         <CornerBottom>{rowHeader}</CornerBottom>
       </SplitCorner>
@@ -148,7 +148,7 @@ export default function TableHeader({
             );
           })}
         </DeptRow>
-        <StaffRow style={{ width: columnsWidth, minWidth: columnsWidth }} $bgColor={bgColor}>
+        <StaffRow style={{ width: columnsWidth, minWidth: columnsWidth }} $subBgColor={bgColor}>
           {departmentTree.map((dept) =>
             dept.children.map((s) => (
               <StaffCell
