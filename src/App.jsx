@@ -73,6 +73,13 @@ export default function App() {
   var backgroundColor = envParams.backgroundcolor || "";
   var mainFontSize = Number(envParams.mainfontsize) || 0;
 
+  // DEBUG: 打印 env 参数排查背景色不生效
+  console.log('[DEBUG] envParams keys:', Object.keys(envParams));
+  console.log('[DEBUG] envParams.backgroundcolor:', JSON.stringify(envParams.backgroundcolor));
+  console.log('[DEBUG] envParams.mainfontsize:', JSON.stringify(envParams.mainfontsize));
+  console.log('[DEBUG] backgroundColor resolved:', JSON.stringify(backgroundColor));
+  console.log('[DEBUG] mainFontSize resolved:', mainFontSize);
+
   var timeFormat = "single";
   if (envParams.showstyle) {
     try {

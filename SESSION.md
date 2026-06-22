@@ -15,7 +15,10 @@
     - 0 或不填 → 默认 11px
   - 数据流: App.jsx → TimeCalendar.jsx → EventBar.jsx / TableHeader.jsx
   - EventBar: 内联 style fontSize 覆盖 styled-components 的 font-size: 11px
-  - 修复背景颜色未生效：AppWrap 外层容器 + ScrollArea 内层容器均未传递 $bgColor，已补齐
+  - 修复背景颜色未全局生效（2 轮）：
+    - 第1轮：AppWrap 外层 + ScrollArea 内层，遗漏了这2个容器
+    - 第2轮：HeaderRow (background:#fff) + StaffRow (background:#fff) + 数据SplitCorner 未传 $bgColor，均已补齐
+    - 涉及容器：AppWrap, AppContainer, ScrollArea, BodyAxisCell, SplitCorner, HeaderRow, StaffRow
 
 ## 正在进行 / In Progress
 
