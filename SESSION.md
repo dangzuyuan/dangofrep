@@ -6,19 +6,12 @@
 ## 刚刚完成 / Just Completed
 
 - 修复移动端时间轴滑动 + iOS 专属多轮优化
-- **新增 2 个环境变量**：backgroundcolor + mainfontsize
-  - backgroundcolor: 控制 AppContainer/BodyAxisCell/SplitCorner 背景色（envParams.backgroundcolor）
-    - 格式：任意 CSS 颜色值（如 `#f5f5f5`、`rgb(240,240,240)`、`white`、`rgba(0,0,0,0.1)`）
-    - 空字符串或不填 → 默认 `#fff` / `#fafafa`
-  - mainfontsize: 控制主事件条 Bar 字体大小（envParams.mainfontsize）
-    - 格式：纯数字（如 `14`），单位 px
-    - 0 或不填 → 默认 11px
-  - 数据流: App.jsx → TimeCalendar.jsx → EventBar.jsx / TableHeader.jsx
-  - EventBar: 内联 style fontSize 覆盖 styled-components 的 font-size: 11px
-  - 修复背景颜色未全局生效（2 轮）：
-    - 第1轮：AppWrap 外层 + ScrollArea 内层，遗漏了这2个容器
-    - 第2轮：HeaderRow (background:#fff) + StaffRow (background:#fff) + 数据SplitCorner 未传 $bgColor，均已补齐
-    - 涉及容器：AppWrap, AppContainer, ScrollArea, BodyAxisCell, SplitCorner, HeaderRow, StaffRow
+- **重构 3 个环境变量**：backgroundcolor / subbackgroundcolor / mainfontsize
+  - backgroundcolor：仅表格区域（ScrollArea 内容区），参数名统一为 `backgroundcolor`
+  - subbackgroundcolor：时间轴 + 表头 + 锚定区（BodyAxisCell/SplitCorner/HeaderRow/StaffRow），默认白色
+  - mainfontsize：主事件条字体大小
+  - 区域划分：表格=$tableBgColor(ScrollArea)；子区域=$subBgColor(时间轴+表头+锚定区)
+  - AppContainer(AppWrap) 恢复固定白色，不参与动态背景
 
 ## 正在进行 / In Progress
 

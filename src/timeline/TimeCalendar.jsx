@@ -194,11 +194,6 @@ export default function TimeCalendar({
   const scrollRef = useRef(null);
   useScrollLock(scrollRef, isIOS);
 
-  // DEBUG
-  console.log('[DEBUG TimeCalendar] backgroundColor:', JSON.stringify(backgroundColor));
-  console.log('[DEBUG TimeCalendar] subBackgroundColor:', JSON.stringify(subBackgroundColor));
-  console.log('[DEBUG TimeCalendar] mainFontSize:', mainFontSize);
-
   // 点击空白区域取消选中
   const handleBackgroundClick = (e) => {
     // 如果点击的是背景区域（不是事件条），则取消选中
