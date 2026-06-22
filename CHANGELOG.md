@@ -7,6 +7,8 @@
 - 新增环境变量 mainfontsize：控制主事件条字体大小，值为数字（px），默认 11px
 - 通过 DEBUG 日志定位 key 拼写问题（用户配置为 backgroupcolor），统一为 backgroundcolor
 - 移除 DEBUG 日志，代码清理完毕
+- 副事件(排班事件)不透明化：opacity=1 + 移除颜色透明度后缀，避免背景色干扰
+- 网格线：#c8c8c8→#d9d9d9 + StaffColumn网格层右侧加borderRight=#d9d9d9，列间纵线可见
 
 ## 2026-06-18
 

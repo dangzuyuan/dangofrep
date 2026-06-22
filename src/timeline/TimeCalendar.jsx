@@ -1,4 +1,5 @@
 import React, { useMemo, useRef } from 'react';
+import { COLOR_GRID_LINE } from '../utils/constants';
 import styled from 'styled-components';
 import TimelineAxis from './TimelineAxis';
 import TableHeader from './TableHeader';
@@ -128,7 +129,7 @@ export default function TimeCalendar({
   const gridBg = useMemo(() => {
     const slotHeight = calculatedRowHeight / timeMeta.numSlots;
     const linePos = slotHeight - 1;
-    return `repeating-linear-gradient(to bottom, transparent 0px, transparent ${linePos}px, #d9d9d9 ${linePos}px, #d9d9d9 ${slotHeight}px)`;
+    return `repeating-linear-gradient(to bottom, transparent 0px, transparent ${linePos}px, ${COLOR_GRID_LINE} ${linePos}px, ${COLOR_GRID_LINE} ${slotHeight}px)`;
   }, [calculatedRowHeight, timeMeta.numSlots]);
 
   const getEventPosition = (ev) => {
@@ -273,7 +274,7 @@ export default function TimeCalendar({
                 idx={idx}
                 rowHeight={calculatedRowHeight}
                 colWidth={colWidth}
-                gridBg="transparent"
+                gridBg={gridBg}
                 data-resource-column
                 data-resource-id={s.id || s.accountId}
                 onMouseDown={(e) => handleSelectStart(e, s.id || s.accountId)}
