@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+﻿import React, { useState, useMemo, useRef } from 'react';
 import { COLOR_GRID_LINE, Z_BAR_MAIN } from '../utils/constants';
 import styled from 'styled-components';
 import TimelineAxis from './TimelineAxis';
@@ -195,8 +195,21 @@ export default function TimeCalendar({
   const scrollRef = useRef(null);
   useScrollLock(scrollRef, isIOS);
 
+  // 时间格选中状态
+  const [selectedSlot, setSelectedSlot] = useState(null);
+
+  // 处理时间轴点击——计算哪个时间格被点击
+  const handleTimelineClick = (clickY) => {
+    const slotHeightPx = calculatedRowHeight / timeMeta.numSlots;
+    const slotIndex = Math.floor(clickY / slotHeightPx);
+    const topPct = (slotIndex * slotHeightPx / calculatedRowHeight) * 100;
+    const heightPct = (slotHeightPx / calculatedRowHeight) * 100;
+    setSelectedSlot({ top: topPct, height: heightPct });
+  };
+
   // 点击空白区域取消选中
   const handleBackgroundClick = (e) => {
+    setSelectedSlot(null);
     // 如果点击的是背景区域（不是事件条），则取消选中
     if (onEventClick && e.target === e.currentTarget) {
       onEventClick(null);
@@ -221,6 +234,19 @@ export default function TimeCalendar({
         <BodyRow style={{ height: calculatedRowHeight }} $totalWidth={totalWidth}>
           {/* 全局网格背景 */}
           <GlobalGridBg totalWidth={totalWidth} style={{ background: gridBg }} />
+
+          {selectedSlot && (
+            <div style={{
+              position: 'absolute',
+              top: `${selectedSlot.top}%`,
+              height: `${selectedSlot.height}%`,
+              left: 0, right: 0,
+              backgroundColor: 'rgba(24, 144, 255, 0.2)',
+              pointerEvents: 'none',
+              zIndex: 7,
+            }}
+            />
+          )}
           
           {/* 无资源时的空状态提�?*/}
           {resources.length === 0 && (
@@ -251,6 +277,7 @@ export default function TimeCalendar({
               rowHeight={calculatedRowHeight}
               axisWidth={axisWidth}
               timeFormat={timeFormat}
+              onSlotClick={handleTimelineClick}
             />
           </BodyAxisCell>
           {resources.map((s, idx) => {
@@ -327,6 +354,7 @@ export default function TimeCalendar({
                       isDragging={isDragging}  // 传递拖拽状�?
                       isResizing={isResizing}  // 传递拉伸状�?
                       isSelected={selectedEventId === ev.id}  // 传递选中状�?
+                      onDeselect={() => setSelectedSlot(null)}
                       isOverlapping={moveDragState && moveDragState.eventId === ev.id && moveDragState.isOverlapping}
                       layoutLeft={layout.left}
                       layoutWidth={layout.width}

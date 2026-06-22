@@ -9,6 +9,7 @@ const AxisContainer = styled.div`
   border-right: 1px solid #e8e8e8;
   position: relative;
   overflow: hidden;
+  cursor: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSI1Ij48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMS44IiBmaWxsPSJibGFjayIvPjxyZWN0IHg9IjAiIHk9IjMuMiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjEuOCIgZmlsbD0iYmxhY2siLz48cG9seWdvbiBwb2ludHM9IjIwLDAgMzAsMi41IDIwLDUiIGZpbGw9ImJsYWNrIi8+PC9zdmc+') 30 2.5, e-resize;
   padding-top: 10px;  /* 给顶部留空间，防止第一个刻度被裁剪 */
   padding-bottom: 10px;  /* 底部也留空间 */
 `;
@@ -29,7 +30,8 @@ export default function TimelineAxis({
   timejiange = 30, 
   rowHeight = 600,
   axisWidth = 80,
-  timeFormat = "single"  // 'single' 或 'range'
+  timeFormat = "single",  // 'single' 或 'range'
+  onSlotClick,
 }) {
   const slots = useMemo(() => {
     const result = [];
@@ -72,7 +74,7 @@ export default function TimelineAxis({
   }, [begintime, endtime, timejiange, rowHeight]);
 
   return (
-    <AxisContainer axisWidth={axisWidth} style={{ height: `${rowHeight}px` }}>
+    <AxisContainer axisWidth={axisWidth} style={{ height: `${rowHeight}px` }} onClick={(e) => { e.stopPropagation(); if (onSlotClick) { var r = e.currentTarget.getBoundingClientRect(); console.log("timeline click:",e.clientY-r.top),onSlotClick(e.clientY - r.top); } }}>
       {/* 时间刻度标签 */}
       {slots.map((slot) => (
         <TimeLabel key={slot.minutes} style={{ top: `${slot.top}px` }}>

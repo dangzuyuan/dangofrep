@@ -1,4 +1,4 @@
-// [清理 2026-05-30] 移除未使用的 useCallback
+﻿// [娓呯悊 2026-05-30] 绉婚櫎鏈娇鐢ㄧ殑 useCallback
 import React, { useRef, useEffect } from "react";
 import styled from "styled-components";
 
@@ -23,7 +23,7 @@ const Bar = styled.div`
   }
 `;
 
-// 拉伸手柄样式
+// 鎷変几鎵嬫焺鏍峰紡
 const ResizeHandle = styled.div`
   position: absolute;
   left: 0;
@@ -59,20 +59,21 @@ export default function EventBar({
   height, 
   color = "#1890ff", 
   isBackground = false,
-  isDragging = false,  // 是否正在拖拽
-  isResizing = false,  // 是否正在拉伸
-  isSelected = false,  // 是否被选中
+  isDragging = false,  // 鏄惁姝ｅ湪鎷栨嫿
+  isResizing = false,  // 鏄惁姝ｅ湪鎷変几
+  isSelected = false,  // 鏄惁琚€変腑
   isOverlapping = false,
-  layoutLeft = 0,      // 水平偏移百分比（0-100）
-  layoutWidth = 100,   // 宽度百分比（0-100）
-  mainFontSize = 0,    // 环境变量控制主事件字体大小
+  layoutLeft = 0,      // 姘村钩鍋忕Щ鐧惧垎姣旓紙0-100锛?
+  layoutWidth = 100,   // 瀹藉害鐧惧垎姣旓紙0-100锛?
+  mainFontSize = 0,    // 鐜鍙橀噺鎺у埗涓讳簨浠跺瓧浣撳ぇ灏?
   onDragStart,
   onResizeStart,
   onClick,
+  onDeselect,
   style: extraStyle
 }) {
   const mouseDownPos = useRef({ x: 0, y: 0 });
-  // [清理 2026-05-30] onClickRef 未使用，handleBarClick 已改用 window.__openRecord
+  // [娓呯悊 2026-05-30] onClickRef 鏈娇鐢紝handleBarClick 宸叉敼鐢?window.__openRecord
   // const onClickRef = useRef(onClick);
   // onClickRef.current = onClick;
   const dragMovedRef = useRef(false);
@@ -89,10 +90,10 @@ export default function EventBar({
     return function() { document.removeEventListener("mousemove", handler); };
   }, []);
 
-  // 主事件条字体大小
+  // 涓讳簨浠舵潯瀛椾綋澶у皬
   const dynamicFontSize = mainFontSize > 0 ? mainFontSize : undefined;
 
-  // 背景事件（副事件/排班事件）：不透明，避免半透明叠加表格背景色干扰显示
+  // 鑳屾櫙浜嬩欢锛堝壇浜嬩欢/鎺掔彮浜嬩欢锛夛細涓嶉€忔槑锛岄伩鍏嶅崐閫忔槑鍙犲姞琛ㄦ牸鑳屾櫙鑹插共鎵版樉绀?
   if (isBackground) {
     return (
       <Bar
@@ -123,6 +124,7 @@ export default function EventBar({
 
   const handleBarClick = (e) => {
     if (dragMovedRef.current) return;
+    onDeselect && onDeselect();  // deselect time slot
     if (ev && (ev._rowid || ev.id) && window.__openRecord) {
       window.__openRecord(ev._rowid || ev.id);
     }
@@ -156,7 +158,7 @@ export default function EventBar({
         ...extraStyle
       }}
     >
-      {/* 顶部拉伸手柄 */}
+      {/* 椤堕儴鎷変几鎵嬫焺 */}
       <TopHandle 
         onMouseDown={(e) => {
           dragMovedRef.current = false;
@@ -164,7 +166,7 @@ export default function EventBar({
         }}
       />
       
-      {/* 中间拖拽区域 */}
+      {/* 涓棿鎷栨嫿鍖哄煙 */}
       <div
         style={{
           position: 'absolute',
@@ -181,7 +183,7 @@ export default function EventBar({
         }}
       />
       
-      {/* 底部拉伸手柄 */}
+      {/* 搴曢儴鎷変几鎵嬫焺 */}
       <BottomHandle 
         onMouseDown={(e) => {
           dragMovedRef.current = false;
