@@ -70,7 +70,7 @@ export default function App() {
   var timejiange = Number(envParams.timeInterval) || DEFAULT_TIME_INTERVAL;
   var rowHeader = envParams.rowHeader || DEFAULT_ROW_HEADER;
   var columnHeader = envParams.columnHeader || DEFAULT_COL_HEADER;
-  var backgroundColor = envParams.backgroundcolor || "";
+  var backgroundColor = envParams.backgroundcolor || envParams.backgroupcolor || "";
   var mainFontSize = Number(envParams.mainfontsize) || 0;
 
   // DEBUG: 打印 env 参数排查背景色不生效

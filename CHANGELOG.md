@@ -4,6 +4,8 @@
 
 - 新增环境变量 backgroundcolor：控制表格/时间轴背景颜色，支持任意 CSS 颜色格式（如 `#f5f5f5`、`rgb(240,240,240)`、`white` 等）
 - 新增环境变量 mainfontsize：控制主事件条字体大小，值为数字（px），如 `14`
+- 修复背景颜色未全局生效（2 轮）：补齐 AppWrap/ScrollArea/HeaderRow/StaffRow/SplitCorner 共 7 个容器
+- 添加 DEBUG console.log 排查参数传递链（待用户反馈日志后移除）
 
 ## 2026-06-18
 
