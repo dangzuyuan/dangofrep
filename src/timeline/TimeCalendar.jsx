@@ -128,7 +128,7 @@ export default function TimeCalendar({
   const gridBg = useMemo(() => {
     const slotHeight = calculatedRowHeight / timeMeta.numSlots;
     const linePos = slotHeight - 1;
-    return `repeating-linear-gradient(to bottom, transparent 0px, transparent ${linePos}px, #c8c8c8 ${linePos}px, #c8c8c8 ${slotHeight}px)`;
+    return `repeating-linear-gradient(to bottom, transparent 0px, transparent ${linePos}px, #d9d9d9 ${linePos}px, #d9d9d9 ${slotHeight}px)`;
   }, [calculatedRowHeight, timeMeta.numSlots]);
 
   const getEventPosition = (ev) => {
