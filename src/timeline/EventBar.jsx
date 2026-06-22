@@ -92,7 +92,7 @@ export default function EventBar({
   // 主事件条字体大小
   const dynamicFontSize = mainFontSize > 0 ? mainFontSize : undefined;
 
-  // 背景事件不可交互
+  // 背景事件（副事件/排班事件）：不透明，避免半透明叠加表格背景色干扰显示
   if (isBackground) {
     return (
       <Bar
@@ -104,9 +104,9 @@ export default function EventBar({
           height: `${height}%`,
           left: `${layoutLeft}%`,
           width: `${layoutWidth}%`,
-          backgroundColor: `${color}40`,
+          backgroundColor: color,
           border: 'none',
-          opacity: 0.6,
+          opacity: 1,
           pointerEvents: 'none',
           zIndex: 1,
           display: 'flex',

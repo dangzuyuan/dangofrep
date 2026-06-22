@@ -2,11 +2,11 @@
 
 ## 2026-06-22
 
-- 新增环境变量 backgroundcolor：控制**表格区域**背景颜色（仅 ScrollArea 内容区），支持任意 CSS 颜色，默认白色
+- 新增环境变量 backgroundcolor：控制**表格区域**背景颜色（仅 ScrollArea 内容区），默认白色
 - 新增环境变量 subbackgroundcolor：控制**时间轴+表头+锚定区**背景颜色，默认白色/#fafafa
 - 新增环境变量 mainfontsize：控制主事件条字体大小，值为数字（px），默认 11px
-- 修复背景颜色 key 拼写（用户配置为 backgroupcolor），统一为 backgroundcolor
-- 添加 DEBUG console.log（待确认生效后移除）
+- 通过 DEBUG 日志定位 key 拼写问题（用户配置为 backgroupcolor），统一为 backgroundcolor
+- 移除 DEBUG 日志，代码清理完毕
 
 ## 2026-06-18
 

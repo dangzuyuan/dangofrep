@@ -11,7 +11,7 @@
   - subbackgroundcolor：时间轴 + 表头 + 锚定区（BodyAxisCell/SplitCorner/HeaderRow/StaffRow），默认白色
   - mainfontsize：主事件条字体大小
   - 区域划分：表格=$tableBgColor(ScrollArea)；子区域=$subBgColor(时间轴+表头+锚定区)
-  - AppContainer(AppWrap) 恢复固定白色，不参与动态背景
+  - 已移除 DEBUG 日志，参数 key 统一为 backgroundcolor（不再兼容 backgroupcolor 拼写）
 
 ## 正在进行 / In Progress
 
@@ -19,9 +19,9 @@
 
 ## 下一步 / Next Steps
 
-1. 在明道云配置中设置 backgroundcolor + mainfontsize 环境变量，测试生效
+1. 设置 env: backgroundcolor=#f5f5f5 subbackgroundcolor=#fff mainfontsize=14 测试
 2. iOS 滑动问题待真机验证
-3. git push（如 remote 已配置）
+3. git push
 
 ## 待决定 / Pending Decisions
 
