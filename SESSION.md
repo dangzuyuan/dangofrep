@@ -1,4 +1,4 @@
-﻿# Session Handoff / 会话接续
+# Session Handoff / 会话接续
 
 > 最后更新 2026-06-22 18:30
 > Last updated: 2026-06-22 18:30
