@@ -6,7 +6,8 @@ const StaffColWrap = styled.div`
   border-right: 1px solid #e8e8e8;  /* 与时间轴边框颜色一致 */
   flex-shrink: 0;
   box-sizing: border-box;
-  
+  background: ${(p) => p.$bgColor || 'hsl(' + p.$staffIdx * 36 + ', 80%, 60%)'};
+
   /* 最后一列的右边框加粗，作为整体右边界 */
   &:last-child {
     border-right: 2px solid #c8c8c8;
@@ -56,6 +57,7 @@ export default function StaffColumn({
           background: gridBg,
           zIndex: 2,
           pointerEvents: "none",
+          borderRight: '1px solid #d9d9d9',
         }}
       />
       {/* 事件内容 */}
