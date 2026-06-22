@@ -28,7 +28,7 @@ const AppWrap = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: ${COLOR_WHITE};
+  background: ${(p) => p.$bgColor || COLOR_WHITE};
   font-family: ${FONT_FAMILY_SYSTEM};
 `;
 
@@ -184,7 +184,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-    <AppWrap>
+    <AppWrap $bgColor={backgroundColor}>
       <Toolbar
         currentDate={currentDate}
         onDateChange={setCurrentDate}

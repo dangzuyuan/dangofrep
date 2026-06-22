@@ -17,19 +17,20 @@ const AppContainer = styled.div`
   display: flex;
   flex-direction: column;
   background: ${(p) => p.$bgColor || '#fff'};
-  overflow: hidden;              /* 防止插件内容溢出触发宿主页面滚动 */
-  overscroll-behavior: none;     /* 彻底阻断滚动链到明道云宿主页面 */
+  overflow: hidden;
+  overscroll-behavior: none;
 `;
 
 const ScrollArea = styled.div`
   flex: 1;
-  overflow: auto;  /* 同时支持横向和纵向滚动 */
+  overflow: auto;
   position: relative;
   min-height: 0;
-  touch-action: pan-x pan-y;           /* 声明此元素处理触摸滚动，阻止浏览器手势冒泡到页面 */
-  overscroll-behavior-x: contain;      /* 横向滚到边界不再传递到父级，阻断滚动链 */
-  overscroll-behavior-y: contain;      /* 纵向滚到边界不再传递到父级 */
-  -webkit-overflow-scrolling: touch;  /* iOS WKWebView 启用触摸惯性滚动 */
+  background: ${(p) => p.$bgColor || '#fff'};
+  touch-action: pan-x pan-y;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
   
   /* 自定义滚动条样式 */
   scrollbar-width: thin;  /* Firefox */
@@ -202,7 +203,7 @@ export default function TimeCalendar({
 
   return (
     <AppContainer $bgColor={backgroundColor}>
-      <ScrollArea ref={scrollRef} className={isIOS ? 'ios-scroll-area' : ''} onClick={handleBackgroundClick}>
+      <ScrollArea ref={scrollRef} className={isIOS ? 'ios-scroll-area' : ''} $bgColor={backgroundColor} onClick={handleBackgroundClick}>
         {/* iOS 专属：左侧透明遮罩拦截边缘触摸，防止系统侧滑返回抢占 */}
         {isIOS && <div className="ios-edge-mask" />}
         <TableHeader

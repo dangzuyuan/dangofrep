@@ -1,19 +1,21 @@
 # Session Handoff / 会话接续
 
-> 最后更新: 2026-06-18
-> Last updated: 2026-06-18
+> 最后更新: 2026-06-22
+> Last updated: 2026-06-22
 
 ## 刚刚完成 / Just Completed
 
-- 修复移动端时间轴滑动：固定定位+阻断滚动链（Android 生效）
-- 修复iOS时间轴滑动与表头对齐：webkit惯性滚动+显式宽度
-- V7 iOS专属修复：enabled gate 隔离 Android
-- **V8 工业级**：iOS/Android 双分支滑动，全局守卫+fixed容器+边缘遮罩
-  - useScrollLock.js：iOS if(isIOS) 完整逻辑；Android if(!isIOS) return 跳过一切监听，零干扰原生 overflow
-  - index.js: iOS 写 body.ios-app class，Android 不写
-  - style.less: body.ios-app #app fixed + .ios-scroll-area padding-left:42px + .ios-edge-mask（仅 iOS 生效）
-  - TimeCalendar.jsx: iOS 专属 42px 透明边缘遮罩（isIOS 条件渲染）
-  - 修复：V8 最初版 Android 分支注册了 touchmove 监听导致滑动失败，已回退为 enabled gate 模式
+- 修复移动端时间轴滑动 + iOS 专属多轮优化
+- **新增 2 个环境变量**：backgroundcolor + mainfontsize
+  - backgroundcolor: 控制 AppContainer/BodyAxisCell/SplitCorner 背景色（envParams.backgroundcolor）
+    - 格式：任意 CSS 颜色值（如 `#f5f5f5`、`rgb(240,240,240)`、`white`、`rgba(0,0,0,0.1)`）
+    - 空字符串或不填 → 默认 `#fff` / `#fafafa`
+  - mainfontsize: 控制主事件条 Bar 字体大小（envParams.mainfontsize）
+    - 格式：纯数字（如 `14`），单位 px
+    - 0 或不填 → 默认 11px
+  - 数据流: App.jsx → TimeCalendar.jsx → EventBar.jsx / TableHeader.jsx
+  - EventBar: 内联 style fontSize 覆盖 styled-components 的 font-size: 11px
+  - 背景事件条: fontSize = mainfontsize - 1，最小 9px
 
 ## 正在进行 / In Progress
 
@@ -21,8 +23,8 @@
 
 ## 下一步 / Next Steps
 
-1. iOS 真机：直接/慢速/边缘右滑 → 页面不动；快滑松手惯性；纵向正常
-2. Android 真机：横纵滑动原生顺畅；long-press create 正常
+1. 在明道云配置中设置 backgroundcolor + mainfontsize 环境变量，测试生效
+2. iOS 滑动问题待真机验证
 3. git push（如 remote 已配置）
 
 ## 待决定 / Pending Decisions
