@@ -1,38 +1,29 @@
-# Session Handoff / ä¼šè¯æ¥ç»­
+# Session Handoff / »á»°½ÓĞø
 
-> æœ€åæ›´æ–°: 2026-06-22
-> Last updated: 2026-06-22
+> ×îºó¸üĞÂ 2026-06-22 18:00
+> Last updated: 2026-06-22 18:00
 
-## åˆšåˆšå®Œæˆ / Just Completed
+## ¸Õ¸ÕÍê³É / Just Completed
 
-- ä¿®å¤ç§»åŠ¨ç«¯æ—¶é—´è½´æ»‘åŠ¨ + iOS ä¸“å±å¤šè½®ä¼˜åŒ–
-- **é‡æ„ 3 ä¸ªç¯å¢ƒå˜é‡**ï¼šbackgroundcolor / subbackgroundcolor / mainfontsize
-  - backgroundcolorï¼šä»…è¡¨æ ¼åŒºåŸŸï¼ˆScrollArea å†…å®¹åŒºï¼‰ï¼Œå‚æ•°åç»Ÿä¸€ä¸º `backgroundcolor`
-  - subbackgroundcolorï¼šæ—¶é—´è½´ + è¡¨å¤´ + é”šå®šåŒºï¼ˆBodyAxisCell/SplitCorner/HeaderRow/StaffRowï¼‰ï¼Œé»˜è®¤ç™½è‰²
-  - mainfontsizeï¼šä¸»äº‹ä»¶æ¡å­—ä½“å¤§å°
-  - åŒºåŸŸåˆ’åˆ†ï¼šè¡¨æ ¼=$tableBgColor(ScrollArea)ï¼›å­åŒºåŸŸ=$subBgColor(æ—¶é—´è½´+è¡¨å¤´+é”šå®šåŒº)
-  - å·²ç§»é™¤ DEBUG æ—¥å¿—ï¼Œå‚æ•° key ç»Ÿä¸€ä¸º backgroundcolorï¼ˆä¸å†å…¼å®¹ backgroupcolor æ‹¼å†™ï¼‰
+- **ĞŞ¸´¸ñÏß²ãµşË³Ğò**£º¸ñÏßÓÉÄÚ²ã grid div(z-index:2) »æÖÆ£¬ÏÖÎ»ÓÚ¸±ÊÂ¼ş(z-index:1)Ö®ÉÏ¡¢Ö÷ÊÂ¼ş(z-index:3)Ö®ÏÂ
+  - ÒıÈë COLOR_GRID_LINE = "#c8c8c8" ³£Á¿Ìæ´úÓ²±àÂë #d9d9d9
+  - StaffColumn ´«²Î´Ó gridBg="transparent" ¸ÄÎª gridBg={gridBg}
+  - GlobalGridBg(z-index:0) ±£ÁôÓÃÓÚÊ±¼äÖáÇøÓò£¬ÁĞÇøÓò¸ñÏßÓÉ grid div(z-index:2) ¸²¸Ç»æÖÆ
 
-## æ­£åœ¨è¿›è¡Œ / In Progress
+## ÕıÔÚ½øĞĞ / In Progress
 
-- æ— 
+- Ô´ÎÄ¼şÒÑĞŞ¸Ä£¨src/timeline/TimeCalendar.jsx£©£¬dist/bundle.js ĞèÖØĞÂ¹¹½¨²ÅÄÜÔÚÉú²úÉúĞ§
 
-## ä¸‹ä¸€æ­¥ / Next Steps
+## ÏÂÒ»²½ / Next Steps
 
-1. è®¾ç½® env: backgroundcolor=#f5f5f5 subbackgroundcolor=#fff mainfontsize=14 æµ‹è¯•
-2. iOS æ»‘åŠ¨é—®é¢˜å¾…çœŸæœºéªŒè¯
-3. git push
+1. Í¨¹ı HAP/mdye ¹¹½¨¹¤¾ßÖØĞÂÉú³É dist/bundle.js
+2. ²¿Êğ²¢ÑéÖ¤¸ñÏßÔÚ°×É«¸±ÊÂ¼ş±³¾°ÉÏÊÇ·ñ¿É¼û
 
-## å¾…å†³å®š / Pending Decisions
+## ´ı¾ö¶¨ / Pending Decisions
 
-- /v3/departments/lookup ç²¾ç¡®è·å–æ‹–æ‹½éƒ¨é—¨é¡ºåºï¼šå·²ç¡®è®¤ä¸å¯è¡Œï¼Œæ”¹ä¸ºè§†å›¾æ’åºæ–¹æ¡ˆ
-- æ˜¯å¦ç”Ÿæˆé¡¹ç›® run skillï¼ˆ/run-skill-generator è¢«ä¸­æ–­ï¼‰
+- ÎŞ
 
-## æ³¨æ„äº‹é¡¹ / Notes
+## ×¢ÒâÊÂÏî / Notes
 
-- åˆ†æ”¯: overlap-fix
-- push æœªé…ç½® remoteï¼Œéœ€æ‰‹åŠ¨ git remote add åæ¨é€
-- adapters.js ä¸­ buildDepartmentTree çš„ sort å·²å…¨éƒ¨ç§»é™¤
-- headerLoader.js çš„æ‹¼éŸ³æ’åº + é‡å»º Map é€»è¾‘å·²ç§»é™¤
-- useTouchCreate.jsï¼šHOLD_MS=500, MOVE_CANCEL_PX=10
-- App.jsxï¼šæ–°å¢ sessionStorage è¯»å†™ currentDate
+- Èç¹û¸ñÏß²»¹»Ã÷ÏÔ£¬¿Éµ÷Õû COLOR_GRID_LINE Îª¸üÉîÉ«£¨Èç #b0b0b0£©
+- ±¾´ÎĞŞ¸Ä²»¸Ä±ä¸±ÊÂ¼ş opacity=1 µÄĞĞÎª£¬Ö»Í¨¹ıµ÷Õû z-index ²ãµşÈ·±£¸ñÏß¿É¼û
