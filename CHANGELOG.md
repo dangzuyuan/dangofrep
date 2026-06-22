@@ -14,6 +14,11 @@
 - 格线延伸至时间轴：BodyAxisCell 多重背景(gridBg + subBgColor)，格线与列区域位置一致
 - 删除列空状态“暂无安排”图标及文字，无事件时空列不显示内容
 
+- 新增时间格选中高亮：点击时间轴整行浅蓝高亮(z-index:7,rgba蓝色20%)
+- 修复高亮被瞬间清除：时间轴点击添加 e.stopPropagation() 阻止冒泡到 handleBackgroundClick
+- 自定义光标：30px*5px SVG base64 右箭头(=>形状)，替代默认指针
+- EventBar 新增 onDeselect 回调：事件点击时取消时间格高亮
+
 ## 2026-06-18
 
 - 修复移动端时间轴滑动：固定定位+阻断滚动链
