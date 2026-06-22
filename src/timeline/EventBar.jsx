@@ -65,6 +65,7 @@ export default function EventBar({
   isOverlapping = false,
   layoutLeft = 0,      // 水平偏移百分比（0-100）
   layoutWidth = 100,   // 宽度百分比（0-100）
+  mainFontSize = 0,    // 环境变量控制主事件字体大小
   onDragStart,
   onResizeStart,
   onClick,
@@ -88,6 +89,9 @@ export default function EventBar({
     return function() { document.removeEventListener("mousemove", handler); };
   }, []);
 
+  // 主事件条字体大小
+  const dynamicFontSize = mainFontSize > 0 ? mainFontSize : undefined;
+
   // 背景事件不可交互
   if (isBackground) {
     return (
@@ -110,7 +114,7 @@ export default function EventBar({
           padding: '2px 0 0 4px'
         }}
       >
-        <span style={{ fontSize: 10, color: '#333', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <span style={{ fontSize: mainFontSize > 0 ? Math.max(9, mainFontSize - 1) : 10, color: '#333', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {ev.title}
         </span>
       </Bar>
@@ -141,6 +145,7 @@ export default function EventBar({
         height: `${height}%`,
         left: `${layoutLeft}%`,
         width: `${layoutWidth}%`,
+        fontSize: dynamicFontSize,
         backgroundColor: isOverlapping ? '#ff4d4f80' : (isDragging || isResizing ? `${color}80` : (isSelected ? `${color}cc` : color)),
         border: isOverlapping ? '2px dashed #ff4d4f' : (isDragging || isResizing ? '2px dashed #fff' : (isSelected ? '2px solid #fff' : 'none')),
         opacity: isDragging || isResizing ? 0.7 : 1,

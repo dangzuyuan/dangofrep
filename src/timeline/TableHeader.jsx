@@ -19,7 +19,7 @@ const SplitCorner = styled.div`
   position: sticky;
   left: 0;
   z-index: 11;
-  background: #fafafa;
+  background: ${(p) => p.$bgColor || '#fafafa'};
   display: grid;
   grid-template-rows: 1fr 1fr;
   border-right: 1px solid #e8e8e8;
@@ -103,12 +103,13 @@ export default function TableHeader({
   columnsWidth = 0,
   colWidth = 72,
   axisWidth = 80,
-  totalWidth = 0
+  totalWidth = 0,
+  bgColor = ""
 }) {
   if (!departmentTree || departmentTree.length === 0) {
     return (
       <HeaderRow $totalWidth={totalWidth}>
-        <SplitCorner axisWidth={axisWidth}>
+        <SplitCorner axisWidth={axisWidth} $bgColor={bgColor}>
           <CornerTop>{columnHeader}</CornerTop>
           <CornerBottom>{rowHeader}</CornerBottom>
         </SplitCorner>

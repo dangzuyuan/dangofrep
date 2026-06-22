@@ -70,6 +70,8 @@ export default function App() {
   var timejiange = Number(envParams.timeInterval) || DEFAULT_TIME_INTERVAL;
   var rowHeader = envParams.rowHeader || DEFAULT_ROW_HEADER;
   var columnHeader = envParams.columnHeader || DEFAULT_COL_HEADER;
+  var backgroundColor = envParams.backgroundcolor || "";
+  var mainFontSize = Number(envParams.mainfontsize) || 0;
 
   var timeFormat = "single";
   if (envParams.showstyle) {
@@ -213,6 +215,8 @@ export default function App() {
         onEventDrop={dragHandlers.onEventDrop}
         onEventResize={dragHandlers.onEventResize}
         onSelectSlot={dragHandlers.onSelectSlot}
+        backgroundColor={backgroundColor}
+        mainFontSize={mainFontSize}
       />
       {showDebug && <DebugPanel logs={logs} />}
     </AppWrap>

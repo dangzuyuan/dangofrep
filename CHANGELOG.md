@@ -6,10 +6,10 @@
 - 修复iOS时间轴滑动与表头对齐：webkit惯性滚动+显式宽度
 - V7 iOS专属修复：enabled gate + iOS检测隔离Android，零影响
 - **V8 工业级**：iOS/Android 双分支滑动，全局守卫+fixed容器+边缘遮罩
-  - useScrollLock.js 内置 iOS/Android 双分支常量与逻辑
-  - iOS: touchstart 立即挂载 document 全局捕获守卫，rAF 动量动画
-  - Android: 仅方向判定 + preventDefault，原生 overflow 滚动不动
+  - useScrollLock.js：iOS 完整逻辑（全局守卫+手动scrollLeft+rAF动量）；Android `if(!isIOS) return` 零监听
   - index.js: iOS 写 body.ios-app class
+  - style.less: body.ios-app #app fixed + .ios-scroll-area padding-left:42px + .ios-edge-mask
+  - TimeCalendar.jsx: iOS 专属 42px 透明边缘遮罩 div
   - style.less: body.ios-app #app fixed + .ios-scroll-area padding-left:42px + transform
   - TimeCalendar.jsx: iOS 专属 42px 透明边缘遮罩，拦截系统侧滑返回触摸
 

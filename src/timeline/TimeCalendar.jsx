@@ -16,7 +16,7 @@ const AppContainer = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: ${(p) => p.$bgColor || '#fff'};
   overflow: hidden;              /* 防止插件内容溢出触发宿主页面滚动 */
   overscroll-behavior: none;     /* 彻底阻断滚动链到明道云宿主页面 */
 `;
@@ -79,7 +79,7 @@ const BodyAxisCell = styled.div`
   position: sticky;
   left: 0;
   z-index: 6;
-  background: #fafafa;  /* 完全不透明背景，防止横向滚动时右侧内容透过 */
+  background: ${(p) => p.$bgColor || '#fafafa'};  /* 动态背景色，不完全透明防止横向滚动时右侧内容透过 */
   border-right: 1px solid #e8e8e8;
   flex-shrink: 0;
 `;
@@ -98,6 +98,9 @@ export default function TimeCalendar({
   rowHeader = "人员",
   timeFormat = "single",  // 时间格式：'single' (08:00) 或 'range' (08:00-08:30)
   selectedEventId = null,  // 选中的事件 ID
+  // 外观配置
+  backgroundColor = "",
+  mainFontSize = 0,
   // 交互回调
   onEventClick,
   onEventDrop,
@@ -198,7 +201,7 @@ export default function TimeCalendar({
   };
 
   return (
-    <AppContainer>
+    <AppContainer $bgColor={backgroundColor}>
       <ScrollArea ref={scrollRef} className={isIOS ? 'ios-scroll-area' : ''} onClick={handleBackgroundClick}>
         {/* iOS 专属：左侧透明遮罩拦截边缘触摸，防止系统侧滑返回抢占 */}
         {isIOS && <div className="ios-edge-mask" />}
@@ -210,6 +213,7 @@ export default function TimeCalendar({
           colWidth={colWidth}
           axisWidth={axisWidth}
           totalWidth={totalWidth}
+          bgColor={backgroundColor}
         />
         <BodyRow style={{ height: calculatedRowHeight }} $totalWidth={totalWidth}>
           {/* 全局网格背景 */}
@@ -236,7 +240,7 @@ export default function TimeCalendar({
             </div>
           )}
           
-          <BodyAxisCell axisWidth={axisWidth} style={{ height: calculatedRowHeight }}>
+          <BodyAxisCell axisWidth={axisWidth} $bgColor={backgroundColor} style={{ height: calculatedRowHeight }}>
             <TimelineAxis 
               begintime={begintime}
               endtime={endtime}
@@ -329,7 +333,7 @@ export default function TimeCalendar({
                   var isResizing = hasPendingResize && !resizeState._final;
                   
                   return (
-                    <EventBar 
+                    <EventBar
                       key={ev.id}
                       ev={{ ...ev, layoutZIndex: layout.zIndex }}
                       top={top}
@@ -342,6 +346,7 @@ export default function TimeCalendar({
                       isOverlapping={moveDragState && moveDragState.eventId === ev.id && moveDragState.isOverlapping}
                       layoutLeft={layout.left}
                       layoutWidth={layout.width}
+                      mainFontSize={mainFontSize}
                       onDragStart={(e) => handleDragStart(e, ev, s.id || s.accountId)}
                       onResizeStart={(e, direction) => handleResizeStart(e, ev, s.id || s.accountId, direction)}
                       onClick={() => onEventClick && onEventClick(ev)}
@@ -364,6 +369,7 @@ export default function TimeCalendar({
                     isDragging={true}
                     isResizing={false}
                     isOverlapping={moveDragState && moveDragState.isOverlapping}
+                    mainFontSize={mainFontSize}
                   />
                 )}
             </StaffColumn>

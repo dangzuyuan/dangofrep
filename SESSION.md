@@ -9,12 +9,11 @@
 - 修复iOS时间轴滑动与表头对齐：webkit惯性滚动+显式宽度
 - V7 iOS专属修复：enabled gate 隔离 Android
 - **V8 工业级**：iOS/Android 双分支滑动，全局守卫+fixed容器+边缘遮罩
-  - useScrollLock.js 完全重写：iOS/Android 双分支常量 + 逻辑
-  - iOS: touchstart→addDocGuard 立即挂载 document 捕获守卫；横向→scrollLeft+速度采样；touchend→rAF 动量
-  - Android: 仅方向判定+preventDefault，原生 overflow 不动
-  - index.js: iOS 写 body.ios-app class
-  - style.less: body.ios-app #app fixed + .ios-scroll-area padding-left:42px + .ios-edge-mask
-  - TimeCalendar.jsx: iOS 专属 42px 透明边缘遮罩 div
+  - useScrollLock.js：iOS if(isIOS) 完整逻辑；Android if(!isIOS) return 跳过一切监听，零干扰原生 overflow
+  - index.js: iOS 写 body.ios-app class，Android 不写
+  - style.less: body.ios-app #app fixed + .ios-scroll-area padding-left:42px + .ios-edge-mask（仅 iOS 生效）
+  - TimeCalendar.jsx: iOS 专属 42px 透明边缘遮罩（isIOS 条件渲染）
+  - 修复：V8 最初版 Android 分支注册了 touchmove 监听导致滑动失败，已回退为 enabled gate 模式
 
 ## 正在进行 / In Progress
 
