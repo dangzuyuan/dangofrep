@@ -6,7 +6,7 @@ const HeaderRow = styled.div`
   position: sticky;
   top: 0;
   z-index: 10;
-  background: #fff;
+  background: ${(p) => p.$bgColor || '#fff'};
   border-bottom: 1px solid #e8e8e8;
   flex-shrink: 0;
   width: ${(p) => p.$totalWidth}px;       /* 显式像素宽度，与 BodyRow 保持一致 */
@@ -78,7 +78,7 @@ const DeptCell = styled.div`
 
 const StaffRow = styled.div`
   display: flex;
-  background: #fff;
+  background: ${(p) => p.$bgColor || '#fff'};
   border-bottom: 1px solid #e8e8e8;
   overflow: hidden;
   flex-shrink: 0;
@@ -108,7 +108,7 @@ export default function TableHeader({
 }) {
   if (!departmentTree || departmentTree.length === 0) {
     return (
-      <HeaderRow $totalWidth={totalWidth}>
+      <HeaderRow $totalWidth={totalWidth} $bgColor={bgColor}>
         <SplitCorner axisWidth={axisWidth} $bgColor={bgColor}>
           <CornerTop>{columnHeader}</CornerTop>
           <CornerBottom>{rowHeader}</CornerBottom>
@@ -125,8 +125,8 @@ export default function TableHeader({
   }
 
   return (
-    <HeaderRow $totalWidth={totalWidth}>
-      <SplitCorner axisWidth={axisWidth}>
+    <HeaderRow $totalWidth={totalWidth} $bgColor={bgColor}>
+      <SplitCorner axisWidth={axisWidth} $bgColor={bgColor}>
         <CornerTop>{columnHeader}</CornerTop>
         <CornerBottom>{rowHeader}</CornerBottom>
       </SplitCorner>
@@ -148,7 +148,7 @@ export default function TableHeader({
             );
           })}
         </DeptRow>
-        <StaffRow style={{ width: columnsWidth, minWidth: columnsWidth }}>
+        <StaffRow style={{ width: columnsWidth, minWidth: columnsWidth }} $bgColor={bgColor}>
           {departmentTree.map((dept) =>
             dept.children.map((s) => (
               <StaffCell

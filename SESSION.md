@@ -15,7 +15,7 @@
     - 0 或不填 → 默认 11px
   - 数据流: App.jsx → TimeCalendar.jsx → EventBar.jsx / TableHeader.jsx
   - EventBar: 内联 style fontSize 覆盖 styled-components 的 font-size: 11px
-  - 背景事件条: fontSize = mainfontsize - 1，最小 9px
+  - 修复背景颜色未生效：AppWrap 外层容器 + ScrollArea 内层容器均未传递 $bgColor，已补齐
 
 ## 正在进行 / In Progress
 
