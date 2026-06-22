@@ -11,6 +11,7 @@
  * @returns {Array} 每个事件的布局信息 { left, width, zIndex }
  */
 export function calculateEventLayout(events) {
+  const Z_BAR_MAIN = 3;
   if (!events || events.length === 0) {
     return [];
   }
@@ -19,7 +20,7 @@ export function calculateEventLayout(events) {
   const layout = events.map(() => ({
     left: 0,
     width: 100,
-    zIndex: 1
+    zIndex: Z_BAR_MAIN
   }));
 
   // 找出所有重叠组
@@ -38,7 +39,7 @@ export function calculateEventLayout(events) {
     group.forEach((eventIndex, position) => {
       layout[eventIndex].left = position * columnWidth;
       layout[eventIndex].width = columnWidth;
-      layout[eventIndex].zIndex = position + 1; // 后面的事件 z-index 更高
+      layout[eventIndex].zIndex = Z_BAR_MAIN + position; // 后面的事件 z-index 更高
     });
   });
 

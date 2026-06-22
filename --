@@ -1,5 +1,5 @@
 import React, { useMemo, useRef } from 'react';
-import { COLOR_GRID_LINE, Z_BAR_MAIN } from '../utils/constants';
+import { COLOR_GRID_LINE } from '../utils/constants';
 import styled from 'styled-components';
 import TimelineAxis from './TimelineAxis';
 import TableHeader from './TableHeader';
@@ -33,7 +33,7 @@ const ScrollArea = styled.div`
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
   
-  /* 自定义滚动条样式 */
+  /* ???????? */
   scrollbar-width: thin;  /* Firefox */
   
   &::-webkit-scrollbar {
@@ -59,16 +59,16 @@ const BodyRow = styled.div`
   display: flex;
   position: relative;
   flex-shrink: 0;
-  width: ${(p) => p.$totalWidth}px;       /* 显式像素宽度，iOS Safari 对齐表头 */
+  width: ${(p) => p.$totalWidth}px;       /* ???????iOS Safari ???? */
   min-width: 100%;
 `;
 
-// 全局网格背景（覆盖时间轴 + 所有资源列�?
+// ???????????? + ??????
 const GlobalGridBg = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  width: ${(props) => props.totalWidth}px;  /* 精确限制网格背景宽度，防止超出表头右边界 */
+  width: ${(props) => props.totalWidth}px;  /* ???????????????????? */
   height: 100%;
   pointer-events: none;
   z-index: 0;
@@ -81,7 +81,7 @@ const BodyAxisCell = styled.div`
   position: sticky;
   left: 0;
   z-index: 6;
-  background: ${(p) => p.$gridBg || 'transparent'}, ${(p) => p.$subBgColor || '#fafafa'};  /* 子区域背景色（时间轴/表头/锚定区） */
+  background: ${(p) => p.$subBgColor || '#fafafa'};  /* ??????????/??/???? */
   border-right: 1px solid #e8e8e8;
   flex-shrink: 0;
 `;
@@ -93,18 +93,18 @@ export default function TimeCalendar({
   begintime = "07:00",
   endtime = "23:00",
   timejiange = 30,
-  slotHeight = 60,  // 单个时间格的高度（像素）
+  slotHeight = 60,  // ????????????
   colWidth = 72,
   axisWidth = 80,
-  columnHeader = "时间",
-  rowHeader = "人员",
-  timeFormat = "single",  // 时间格式�?single' (08:00) �?'range' (08:00-08:30)
-  selectedEventId = null,  // 选中的事�?ID
-  // 外观配置
+  columnHeader = "??",
+  rowHeader = "??",
+  timeFormat = "single",  // ?????'single' (08:00) ? 'range' (08:00-08:30)
+  selectedEventId = null,  // ????? ID
+  // ????
   backgroundColor = "",
   subBackgroundColor = "",
   mainFontSize = 0,
-  // 交互回调
+  // ????
   onEventClick,
   onEventDrop,
   onEventResize,
@@ -120,10 +120,10 @@ export default function TimeCalendar({
     return { totalMin, numSlots };
   }, [begintime, endtime, timejiange]);
 
-  // 计算总行高：时间槽数�?× 单个格子高度
+  // ??????????? ? ??????
   const calculatedRowHeight = timeMeta.numSlots * slotHeight;
 
-  // 计算总宽度（用于限制网格背景�?
+  // ???????????????
   const totalWidth = axisWidth + columnsWidth;
 
   const gridBg = useMemo(() => {
@@ -133,7 +133,7 @@ export default function TimeCalendar({
   }, [calculatedRowHeight, timeMeta.numSlots]);
 
   const getEventPosition = (ev) => {
-    // 直接使用已标准化�?startTime/endTime（纯时间字符串）
+    // ????????? startTime/endTime????????
     const [sh, sm] = begintime.split(":").map(Number);
     const startMinTotal = sh * 60 + sm;
     const [eh, em] = endtime.split(":").map(Number);
@@ -145,7 +145,7 @@ export default function TimeCalendar({
     const evStartMin = startH * 60 + startM;
     const evEndMin = endH * 60 + endM;
 
-    // 钳制到时间轴范围，防止背景条/主事件条超出时间轴边�?
+    // ??????????????/???????????
     const clampedStart = Math.max(evStartMin, startMinTotal);
     const clampedEnd = Math.min(evEndMin, endMinTotal);
 
@@ -154,7 +154,7 @@ export default function TimeCalendar({
     return { top, height };
   };
 
-  // 初始化拖�?Hooks
+  // ????? Hooks
   const { 
     handleMouseDown: handleDragStart,
     dragState: moveDragState
@@ -190,14 +190,14 @@ export default function TimeCalendar({
     timejiange
   });
 
-  // iOS 专属方向锁定：Android 跳过，零影响
+  // iOS ???????Android ??????
   var isIOS = /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
   const scrollRef = useRef(null);
   useScrollLock(scrollRef, isIOS);
 
-  // 点击空白区域取消选中
+  // ??????????
   const handleBackgroundClick = (e) => {
-    // 如果点击的是背景区域（不是事件条），则取消选中
+    // ???????????????????????
     if (onEventClick && e.target === e.currentTarget) {
       onEventClick(null);
     }
@@ -206,7 +206,7 @@ export default function TimeCalendar({
   return (
     <AppContainer>
       <ScrollArea ref={scrollRef} className={isIOS ? 'ios-scroll-area' : ''} $tableBgColor={backgroundColor} onClick={handleBackgroundClick}>
-        {/* iOS 专属：左侧透明遮罩拦截边缘触摸，防止系统侧滑返回抢�?*/}
+        {/* iOS ?????????????????????????? */}
         {isIOS && <div className="ios-edge-mask" />}
         <TableHeader
           departmentTree={departmentTree}
@@ -219,10 +219,10 @@ export default function TimeCalendar({
           bgColor={subBackgroundColor}
         />
         <BodyRow style={{ height: calculatedRowHeight }} $totalWidth={totalWidth}>
-          {/* 全局网格背景 */}
+          {/* ?????? */}
           <GlobalGridBg totalWidth={totalWidth} style={{ background: gridBg }} />
           
-          {/* 无资源时的空状态提�?*/}
+          {/* ?????????? */}
           {resources.length === 0 && (
             <div
               style={{
@@ -237,13 +237,13 @@ export default function TimeCalendar({
                 pointerEvents: 'none'
               }}
             >
-              <div style={{ marginBottom: '8px', fontSize: '32px' }}>👥</div>
-              <div>暂无人员数据</div>
-              <div style={{ marginTop: '4px', fontSize: '12px' }}>����������������Դ</div>
+              <div style={{ marginBottom: '8px', fontSize: '32px' }}>??</div>
+              <div>??????</div>
+              <div style={{ marginTop: '4px', fontSize: '12px' }}>?????????</div>
             </div>
           )}
           
-          <BodyAxisCell axisWidth={axisWidth} $subBgColor={subBackgroundColor} $gridBg={gridBg} style={{ height: calculatedRowHeight }}>
+          <BodyAxisCell axisWidth={axisWidth} $subBgColor={subBackgroundColor} style={{ height: calculatedRowHeight }}>
             <TimelineAxis 
               begintime={begintime}
               endtime={endtime}
@@ -260,10 +260,10 @@ export default function TimeCalendar({
             var mi = 0;
             var eventLayouts = staffEvents.map(function(ev) {
               if (ev.isBackground) return { left: 0, width: 100, zIndex: 1 };
-              return mainLayouts[mi++] || { left: 0, width: 100, zIndex: Z_BAR_MAIN };
+              return mainLayouts[mi++] || { left: 0, width: 100, zIndex: 1 };
             });
             
-            // 计算时间基准（用于预览条�?
+            // ?????????????
             const [sh, sm] = begintime.split(":").map(Number);
             const startMinTotal = sh * 60 + sm;
             
@@ -280,6 +280,25 @@ export default function TimeCalendar({
                 onMouseDown={(e) => handleSelectStart(e, s.id || s.accountId)}
                 onTouchStart={(e) => handleTouchStart(e, s.id || s.accountId)}
               >
+                {/* ????? */}
+                {staffEvents.length === 0 && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      textAlign: 'center',
+                      color: '#bfbfbf',
+                      fontSize: '12px',
+                      pointerEvents: 'none',
+                      zIndex: 1
+                    }}
+                  >
+                    <div style={{ marginBottom: '4px' }}>??</div>
+                    <div>????</div>
+                  </div>
+                )}
                 {isSelecting && selectState && (selectState.resourceId === s.id || selectState.resourceId === s.accountId) && (
                   <div style={{position:'absolute',top:(selectState.startMin/timeMeta.totalMin)*100+'%',height:((selectState.endMin-selectState.startMin)/timeMeta.totalMin)*100+'%',left:0,right:0,backgroundColor:'rgba(24,144,255,0.15)',border:'2px dashed #1890ff',borderRadius:4,zIndex:5,pointerEvents:'none'}}/>
                 )}
@@ -289,10 +308,10 @@ export default function TimeCalendar({
                 {staffEvents.map((ev, evIdx) => {
                   let { top, height } = getEventPosition(ev);
                   
-                  // 获取布局信息
-                  const layout = eventLayouts[evIdx] || { left: 0, width: 100, zIndex: Z_BAR_MAIN };
+                  // ??????
+                  const layout = eventLayouts[evIdx] || { left: 0, width: 100, zIndex: 1 };
                   
-                  // 如果正在拖拽此事件，使用预览位置
+                  // ????????????????
                   const isDragging = moveDragState && moveDragState.eventId === ev.id;
                   if (isDragging) {
                     const [sh, sm] = begintime.split(":").map(Number);
@@ -303,7 +322,7 @@ export default function TimeCalendar({
                     height = previewHeight;
                   }
                   
-                  // 如果正在拉伸此事件，使用预览位置（含 _final 阶段�?
+                  // ?????????????????? _final ???
                   var hasPendingResize = resizeState && resizeState.eventId === ev.id;
                   if (hasPendingResize) {
                     const [sh, sm] = begintime.split(":").map(Number);
@@ -324,9 +343,9 @@ export default function TimeCalendar({
                       height={height}
                       color={ev.color}
                       isBackground={ev.isBackground || false}
-                      isDragging={isDragging}  // 传递拖拽状�?
-                      isResizing={isResizing}  // 传递拉伸状�?
-                      isSelected={selectedEventId === ev.id}  // 传递选中状�?
+                      isDragging={isDragging}  // ??????
+                      isResizing={isResizing}  // ??????
+                      isSelected={selectedEventId === ev.id}  // ??????
                       isOverlapping={moveDragState && moveDragState.eventId === ev.id && moveDragState.isOverlapping}
                       layoutLeft={layout.left}
                       layoutWidth={layout.width}
@@ -338,7 +357,7 @@ export default function TimeCalendar({
                   );
                 })}
                 
-                {/* 横向拖动预览：如果有事件正在拖拽到当前列，显示预览条 */}
+                {/* ?????????????????????????? */}
                 {moveDragState && moveDragState.resourceId === (s.id || s.accountId) && (
                   <EventBar
                     key={`preview-${moveDragState.eventId}`}
@@ -364,6 +383,3 @@ export default function TimeCalendar({
     </AppContainer>
   );
 }
-
-
-
