@@ -1,16 +1,14 @@
-﻿/**
+/**
  * 事件重叠并排布局算法
  * 
  * 检测同一资源列中时间重叠的事件，计算水平偏移量和宽度，实现并排显示。
  */
 
-const GAP_PERCENT = 0.4; // 重叠并排时的水平间隙（百分比）
-
 /**
  * 计算事件的重叠分组和布局位置
  * 
  * @param {Array} events - 同一资源列的事件列表（已按 startTime 排序）
- * @returns {Array} 每个事件的布局信息 { left, width, zIndex, overlapCount, overlapIndex }
+ * @returns {Array} 每个事件的布局信息 { left, width, zIndex }
  */
 export function calculateEventLayout(events) {
   const Z_BAR_MAIN = 3;
@@ -22,9 +20,7 @@ export function calculateEventLayout(events) {
   const layout = events.map(() => ({
     left: 0,
     width: 100,
-    zIndex: Z_BAR_MAIN,
-    overlapCount: 0,
-    overlapIndex: 0,
+    zIndex: Z_BAR_MAIN
   }));
 
   // 找出所有重叠组
@@ -37,17 +33,13 @@ export function calculateEventLayout(events) {
       return;
     }
 
-    // 多个事件重叠，计算并排布局（含间隙）
-    const totalGap = GAP_PERCENT * (group.length - 1);
-    const columnWidth = (100 - totalGap) / group.length;
-    const gapOffset = GAP_PERCENT;
-
+    // 多个事件重叠，计算并排布局
+    const columnWidth = 100 / group.length;
+    
     group.forEach((eventIndex, position) => {
-      layout[eventIndex].left = position * (columnWidth + gapOffset);
+      layout[eventIndex].left = position * columnWidth;
       layout[eventIndex].width = columnWidth;
       layout[eventIndex].zIndex = Z_BAR_MAIN + position; // 后面的事件 z-index 更高
-      layout[eventIndex].overlapCount = group.length;
-      layout[eventIndex].overlapIndex = position;
     });
   });
 
@@ -75,7 +67,7 @@ function findOverlapGroups(events) {
       if (visited.has(j)) continue;
 
       // 检查是否与组内任意事件重叠
-      const overlapsWithGroup = group.some(idx =>
+      const overlapsWithGroup = group.some(idx => 
         isOverlapping(events[idx], events[j])
       );
 
@@ -90,9 +82,6 @@ function findOverlapGroups(events) {
     }
   }
 
-  // 确保非重叠的单个事件也被标记为 overlapCount=1
-  if (false) {} // placeholder
-
   return groups;
 }
 
@@ -100,7 +89,7 @@ function findOverlapGroups(events) {
  * 判断两个事件是否时间重叠
  * 
  * @param {Object} ev1 - 事件1（包含 startTime, endTime）
- * @param {Object} ev2 - 事件2
+ * @param {Object} ev2 - 事件2（包含 startTime, endTime）
  * @returns {boolean} 是否重叠
  */
 function isOverlapping(ev1, ev2) {

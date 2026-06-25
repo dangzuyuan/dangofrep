@@ -286,8 +286,8 @@ export default function TimeCalendar({
             var mainLayouts = calculateEventLayout(mainEvents);
             var mi = 0;
             var eventLayouts = staffEvents.map(function(ev) {
-              if (ev.isBackground) return { left: 0, width: 100, zIndex: 1, overlapCount: 0, overlapIndex: 0 };
-              return mainLayouts[mi++] || { left: 0, width: 100, zIndex: Z_BAR_MAIN, overlapCount: 0, overlapIndex: 0 };
+              if (ev.isBackground) return { left: 0, width: 100, zIndex: 1 };
+              return mainLayouts[mi++] || { left: 0, width: 100, zIndex: Z_BAR_MAIN };
             });
             
             // 计算时间基准（用于预览条�?
@@ -317,7 +317,7 @@ export default function TimeCalendar({
                   let { top, height } = getEventPosition(ev);
                   
                   // 获取布局信息
-                  const layout = eventLayouts[evIdx] || { left: 0, width: 100, zIndex: Z_BAR_MAIN, overlapCount: 0, overlapIndex: 0 };
+                  const layout = eventLayouts[evIdx] || { left: 0, width: 100, zIndex: Z_BAR_MAIN };
                   
                   // 如果正在拖拽此事件，使用预览位置
                   const isDragging = moveDragState && moveDragState.eventId === ev.id;
@@ -358,8 +358,6 @@ export default function TimeCalendar({
                       isOverlapping={moveDragState && moveDragState.eventId === ev.id && moveDragState.isOverlapping}
                       layoutLeft={layout.left}
                       layoutWidth={layout.width}
-                      overlapCount={layout.overlapCount}
-                      overlapIndex={layout.overlapIndex}
                       mainFontSize={mainFontSize}
                       onDragStart={(e) => handleDragStart(e, ev, s.id || s.accountId)}
                       onResizeStart={(e, direction) => handleResizeStart(e, ev, s.id || s.accountId, direction)}

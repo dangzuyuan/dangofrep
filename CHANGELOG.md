@@ -1,5 +1,15 @@
 ﻿# CHANGELOG
 
+## 2026-06-25
+
+- 修复事件默认边框（'none' → 1px solid）、hover boxShadow（inline none → undefined 让 :hover 生效）
+- 修复点击事件打开两次详情页（移除 onMouseUp={handleBarClick}）
+- 重叠并排事件增加水平间隙（GAP_PERCENT=0.4）
+- 事件布局返回 overlapCount/overlapIndex 深度信息
+- 新增 EventBarIsolateStyle（box-sizing: border-box !important）iframe 样式隔离
+- style.less 新增 [data-event-bar] / :hover / #drag-preview-bar !important 兜底规则
+
+
 ## 2026-06-22
 
 - 新增环境变量 backgroundcolor：控制**表格区域**背景颜色（仅 ScrollArea 内容区），默认白色

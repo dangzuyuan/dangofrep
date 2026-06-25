@@ -1,9 +1,9 @@
-﻿html, body {
+html, body {
     margin: 0;
     font-family: Helvetica, 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
     overscroll-behavior-x: none;  /* 页面级禁止横向过度滚动，防止横向手势触发宿主页面操作 */
 }
-/* iOS 专属：锁定根容器为 fixed 全屏，阻止 WKWebView 橡皮筋 */
+/* iOS 专属：锁定根容器为 fixed 全屏，阻断 WKWebView 橡皮筋 */
 body.ios-app {
     position: fixed !important;
     width: 100% !important;
@@ -33,7 +33,7 @@ body.ios-app .ios-scroll-area {
     width: 42px;
     z-index: 20;
     background: transparent;
-    pointer-events: auto;         /* 拦截触摸，防止穿透到页面级 */
+    pointer-events: auto;         /* 拦截触摸，阻止穿透到页面级 */
 }
 * {
     box-sizing: border-box;
@@ -60,23 +60,4 @@ body.ios-app .ios-scroll-area {
 /* iOS 专属：左内边距避开 30px 系统侧滑返回敏感区 */
 .ios-scroll-area {
     padding-left: 40px;
-}
-
-/* ================================================================
-   iframe 环境样式隔离：使用数据属性和 !important 兜底
-   确保事件边框、间距、层级不被明道云全局样式覆盖
-   ================================================================ */
-[data-event-bar] {
-    box-sizing: border-box !important;
-}
-[data-event-bar]:hover {
-    z-index: 20 !important;
-}
-
-/* 拖拽/拉伸预览条 */
-#drag-preview-bar {
-    border: 2px dashed #1890ff !important;
-    border-radius: 4px !important;
-    opacity: 0.7 !important;
-    z-index: 20 !important;
 }

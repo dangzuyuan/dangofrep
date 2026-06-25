@@ -1,6 +1,6 @@
 ﻿// [娓呯悊 2026-05-30] 绉婚櫎鏈娇鐢ㄧ殑 useCallback
 import React, { useRef, useEffect } from "react";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 
 const Bar = styled.div`
   position: absolute;
@@ -19,17 +19,7 @@ const Bar = styled.div`
   
   &:hover {
     transform: scale(1.02);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 0 0 1.5px rgba(255, 255, 255, 0.8);
-  }
-`;
-
-// ================================================================
-// 专属 !important 隔离样式：针对 iframe 环境明道云全局 CSS 覆盖
-// 使用 data-event-bar 属性选择器兜底保护边框宽度和样式
-// ================================================================
-const EventBarIsolateStyle = createGlobalStyle`
-  [data-event-bar] {
-    box-sizing: border-box !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 `;
 
@@ -106,9 +96,7 @@ export default function EventBar({
   // 鑳屾櫙浜嬩欢锛堝壇浜嬩欢/鎺掔彮浜嬩欢锛夛細涓嶉€忔槑锛岄伩鍏嶅崐閫忔槑鍙犲姞琛ㄦ牸鑳屾櫙鑹插共鎵版樉绀?
   if (isBackground) {
     return (
-      <>
-        <EventBarIsolateStyle />
-        <Bar
+      <Bar
         data-event-bar
         data-event-id={ev.id || ev._rowid}
         data-is-background="true"
@@ -118,7 +106,7 @@ export default function EventBar({
           left: `${layoutLeft}%`,
           width: `${layoutWidth}%`,
           backgroundColor: color,
-          border: '1px solid rgba(255,255,255,0.15)',
+          border: 'none',
           opacity: 1,
           pointerEvents: 'none',
           zIndex: 1,
@@ -131,7 +119,6 @@ export default function EventBar({
           {ev.title}
         </span>
       </Bar>
-      </>
     );
   }
 
@@ -148,13 +135,12 @@ export default function EventBar({
   };
 
   return (
-    <>
-      <EventBarIsolateStyle />
-      <Bar
+    <Bar
       data-event-bar
       data-event-id={ev.id || ev._rowid}
       data-is-background="false"
       onClick={handleBarClick}
+      onMouseUp={handleBarClick}
       onMouseDownCapture={handleMouseDown}
       style={{
         top: `${top}%`,
@@ -163,11 +149,11 @@ export default function EventBar({
         width: `${layoutWidth}%`,
         fontSize: dynamicFontSize,
         backgroundColor: isOverlapping ? '#ff4d4f80' : (isDragging || isResizing ? `${color}80` : (isSelected ? `${color}cc` : color)),
-        border: isOverlapping ? '2px dashed #ff4d4f' : (isDragging || isResizing ? '2px dashed #fff' : (isSelected ? '2px solid #fff' : '1px solid rgba(255,255,255,0.35)')),
+        border: isOverlapping ? '2px dashed #ff4d4f' : (isDragging || isResizing ? '2px dashed #fff' : (isSelected ? '2px solid #fff' : 'none')),
         opacity: isDragging || isResizing ? 0.7 : 1,
         pointerEvents: 'auto',
         zIndex: isDragging || isResizing ? 10 : (ev.layoutZIndex || 3),
-        boxShadow: isOverlapping ? '0 0 0 2px #ff4d4f' : (isDragging || isResizing ? '0 4px 12px rgba(0, 0, 0, 0.3)' : (isSelected ? '0 0 0 2px rgba(255, 255, 255, 0.8), 0 4px 12px rgba(0, 0, 0, 0.2)' : undefined)),
+        boxShadow: isOverlapping ? '0 0 0 2px #ff4d4f' : (isDragging || isResizing ? '0 4px 12px rgba(0, 0, 0, 0.3)' : (isSelected ? '0 0 0 2px rgba(255, 255, 255, 0.8), 0 4px 12px rgba(0, 0, 0, 0.2)' : 'none')),
         transition: isDragging || isResizing ? 'none' : 'transform 0.12s ease, box-shadow 0.12s ease',
         ...extraStyle
       }}
@@ -209,6 +195,5 @@ export default function EventBar({
         {ev.title}
       </span>
     </Bar>
-    </>
   );
 }

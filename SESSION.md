@@ -129,3 +129,38 @@
   - eventLayout.js 主事件 z-index 从 1 改为 Z_BAR_MAIN(3)
 - **格线延伸至时间轴**：BodyAxisCell 多重背景(gridBg + subBgColor)，格线与列区域位置一致
 - **删除列空状态**：移除每列的 "暂无安排" 图标及文字，无事件时空列不显示内容
+
+
+## 2026-06-25 This Session
+
+> Last updated: 2026-06-25 09:42
+
+### Just Completed
+
+- 修复事件默认边框（none→1px solid rgba）
+- 修复 hover 阴影（inline boxShadow 改为 undefined，让 :hover 生效）
+- 修复点击事件打开两次详情页（移除 onMouseUp={handleBarClick}）
+- 重叠并排事件增加水平间隙 GAP_PERCENT=0.4
+- 新增 overlapCount/overlapIndex 布局深度信息
+- 新增 EventBarIsolateStyle iframe 样式隔离
+- style.less 新增 [data-event-bar]/:hover/drag-preview-bar !important 规则
+
+### In Progress
+
+- 无
+
+### Next Steps
+
+1. git add + commit + push（当前 .git 目录对 codexsandboxoffline 只读，需手动执行）
+2. 线上验证 iframe 环境下边框/间距/层级稳定性
+3. 后续如有重叠事件视觉优化需求，可恢复 overlap 深度指示器组件
+
+### Pending Decisions
+
+- 无
+
+### Notes
+
+- .git 目录权限限制：BUILTIN\\Users 仅 RX，git 写操作无法执行
+- Chinese 文件用 Node.js 写，不用 PowerShell Set-Content
+- 所有修改基于 EventBar.jsx.bak 还原后再做最小侵入改动
