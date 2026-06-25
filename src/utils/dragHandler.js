@@ -15,12 +15,13 @@ export function createDragHandler(opts) {
   var api = opts.api;
   var utils = opts.utils;
   var config = opts.config;
-  var operatorFieldId = opts.operatorFieldId;
-  var beginFieldId = opts.beginFieldId;
-  var endFieldId = opts.endFieldId;
-  var durationFieldId = opts.durationFieldId;
-  var dateFieldId = opts.dateFieldId;
-  var statusFieldId = opts.statusFieldId;
+  var operatorFieldId = (opts.operatorFieldId || "").trim();
+  var beginFieldId = (opts.beginFieldId || "").trim();
+  var endFieldId = (opts.endFieldId || "").trim();
+  var durationFieldId = (opts.durationFieldId || "").trim();
+  var dateFieldId = (opts.dateFieldId || "").trim();
+  var onError = opts.onError;    /* 可选：失败回调 function(err) */
+  var statusFieldId = (opts.statusFieldId || "").trim();
   var events = opts.events;
   var onSaved = opts.onSaved;
   var controlsRef = opts.controlsRef;
@@ -57,18 +58,18 @@ export function createDragHandler(opts) {
       ev.dur = duration;
       if (newResourceId !== oldAccountId) ev.accountId = newResourceId;
 
-      var controls = [];
-      if (beginFieldId) {
-        controls.push({ controlId: beginFieldId, type: CONTROL_TYPE_DATETIME, value: newStart });
-      }
-      if (durationFieldId) {
-        controls.push({ controlId: durationFieldId, type: CONTROL_TYPE_NUMBER, value: String(duration) });
-      }
+      /* ⚡修复：统一使用 buildTimeControls 组装时间字段 */
+      var controls = buildTimeControls(newStart, newEnd, duration, {
+        beginFieldId: beginFieldId,
+        endFieldId: endFieldId,
+        durationFieldId: durationFieldId
+      });
       if (newResourceId !== oldAccountId && operatorFieldId) {
         var sid = staffIdMap[newResourceId] || newResourceId;
         controls.push({ controlId: operatorFieldId, type: CONTROL_TYPE_RELATION, value: buildFieldValue(CONTROL_TYPE_RELATION, sid) });
       }
 
+      controls = filterValidControls(controls);
       api.updateWorksheetRow({
         appId: appId,
         worksheetId: workbookId,
@@ -78,6 +79,7 @@ export function createDragHandler(opts) {
         onSaved && onSaved();
       }).catch(function(err) {
         console.error("onEventDrop 写入失败:", err);
+        if (onError) onError(err);
       });
     },
 
@@ -97,14 +99,14 @@ export function createDragHandler(opts) {
       ev.start = newStart.substring(0, 5);
       ev.dur = duration;
 
-      var controls = [];
-      if (beginFieldId) {
-        controls.push({ controlId: beginFieldId, type: CONTROL_TYPE_DATETIME, value: newStart });
-      }
-      if (durationFieldId) {
-        controls.push({ controlId: durationFieldId, type: CONTROL_TYPE_NUMBER, value: String(duration) });
-      }
+      /* ⚡修复：统一使用 buildTimeControls 组装时间字段 */
+      var controls = buildTimeControls(newStart, newEnd, duration, {
+        beginFieldId: beginFieldId,
+        endFieldId: endFieldId,
+        durationFieldId: durationFieldId
+      });
 
+      controls = filterValidControls(controls);
       api.updateWorksheetRow({
         appId: appId,
         worksheetId: workbookId,
@@ -114,6 +116,7 @@ export function createDragHandler(opts) {
         onSaved && onSaved();
       }).catch(function(err) {
         console.error("onEventResize 写入失败:", err);
+        if (onError) onError(err);
       });
     },
 
@@ -127,27 +130,21 @@ export function createDragHandler(opts) {
       var em = parseInt(end.split(":")[1], 10);
       var duration = eh * 60 + em - (sh * 60 + sm);
 
-      var controls = [];
+      /* ⚡修复：统一使用 buildTimeControls 组装时间字段 */
+      var controls = buildTimeControls(start, end, duration, {
+        beginFieldId: beginFieldId,
+        endFieldId: endFieldId,
+        durationFieldId: durationFieldId
+      });
       if (operatorFieldId) {
         var sid = staffIdMap[resourceId] || resourceId;
         controls.push({ controlId: operatorFieldId, type: CONTROL_TYPE_RELATION, value: buildFieldValue(CONTROL_TYPE_RELATION, sid) });
       }
-      if (beginFieldId) {
-        var allCs = (controlsRef && controlsRef.current) || [];
-        var bc = allCs.find(function(c) { return c.controlId === beginFieldId; });
-        var beginVal = (bc && bc.type === 46) ? start : (currentDate + " " + start.substring(0, 5) + ":00");
-        controls.push({ controlId: beginFieldId, type: bc ? bc.type : 16, value: beginVal });
-      }
+
       if (dateFieldId && currentDate) {
         controls.push({ controlId: dateFieldId, type: CONTROL_TYPE_DATE, value: currentDate });
       }
-      if (durationFieldId) {
-        controls.push({ controlId: durationFieldId, type: CONTROL_TYPE_NUMBER, value: String(duration) });
-      } else if (endFieldId) {
-        var ec = (controlsRef && controlsRef.current || []).find(function(c) { return c.controlId === endFieldId; });
-        var endVal = (ec && ec.type === 46) ? end : (currentDate + " " + end.substring(0, 5) + ":00");
-        controls.push({ controlId: endFieldId, type: ec ? ec.type : 16, value: endVal });
-      }
+
 
       // 携带所有带默认值的字段（来源：devtest/SKILL_RELATION.md 第四部分）
        var allControls = (controlsRef && controlsRef.current) || [];
@@ -161,6 +158,7 @@ export function createDragHandler(opts) {
         controls.push({ controlId: c.controlId, type: c.type, value: buildFieldValue(c.type, dv) });
        }
 
+      controls = filterValidControls(controls);
       api.addWorksheetRow({
         appId: appId,
         worksheetId: workbookId,
@@ -189,7 +187,89 @@ export function createDragHandler(opts) {
         onSaved && onSaved();
       }).catch(function(err) {
         console.error("onEventDelete 写入失败:", err);
+        if (onError) onError(err);
       });
     },
   };
+}
+
+/* ============================================================
+ * 工具函数：参数过滤 + 时间字段组装
+ * ============================================================ */
+
+/**
+ * 校验时间字符串是否合法
+ * @param {string} str - 时间字符串 "HH:mm" 或 "HH:mm:ss"
+ * @returns {boolean}
+ */
+function isValidTimeString(str) {
+  if (!str || typeof str !== "string") return false;
+  var m = str.match(/^(\d{2}):(\d{2})(?::(\d{2}))?$/);
+  if (!m) return false;
+  var h = parseInt(m[1], 10);
+  var min = parseInt(m[2], 10);
+  var s = m[3] !== undefined ? parseInt(m[3], 10) : 0;
+  return h >= 0 && h <= 23 && min >= 0 && min <= 59 && s >= 0 && s <= 59;
+}
+
+/**
+ * 过滤空值 controls，防止空字段写入明道云接口报错
+ * 过滤规则：controlId 为空/空格、value 为 undefined/null/空白字符串/空数组
+ * @param {Array} controls
+ * @returns {Array}
+ */
+function filterValidControls(controls) {
+  return controls.filter(function(c) {
+    if (!c) return false;
+    if (!c.controlId || c.controlId.trim() === "") return false;
+    if (c.value === undefined || c.value === null) return false;
+    if (typeof c.value === "string" && c.value.trim() === "") return false;
+    if (Array.isArray(c.value) && c.value.length === 0) return false;
+    return true;
+  });
+}
+
+/**
+ * 统一组装时间字段 controls
+ * - beginFieldId：必传（fieldId 非空时）
+ * - durationFieldId：仅当 Number.isInteger(duration) && duration > 0 时传
+ * - endFieldId：仅当 fieldId 非空 && end 为有效时间字符串时传
+ * 注：外层 API 调用前应统一执行 filterValidControls，本函数不做过滤
+ * @param {string} begin - 开始时间 "HH:mm:ss"
+ * @param {string} end - 结束时间 "HH:mm:ss"
+ * @param {number} duration - 时长（分钟）
+ * @param {Object} fieldIds - { beginFieldId, endFieldId, durationFieldId }
+ * @returns {Array}
+ */
+function buildTimeControls(begin, end, duration, fieldIds) {
+  var controls = [];
+
+  /* beginFieldId：必传 */
+  if (fieldIds.beginFieldId) {
+    controls.push({
+      controlId: fieldIds.beginFieldId,
+      type: CONTROL_TYPE_DATETIME,
+      value: begin
+    });
+  }
+
+  /* durationFieldId：仅正整数有效时传 */
+  if (fieldIds.durationFieldId && Number.isInteger(duration) && duration > 0) {
+    controls.push({
+      controlId: fieldIds.durationFieldId,
+      type: CONTROL_TYPE_NUMBER,
+      value: String(duration)
+    });
+  }
+
+  /* endFieldId：仅有效时间字符串时传 */
+  if (fieldIds.endFieldId && isValidTimeString(end)) {
+    controls.push({
+      controlId: fieldIds.endFieldId,
+      type: CONTROL_TYPE_DATETIME,
+      value: end
+    });
+  }
+
+  return controls;
 }

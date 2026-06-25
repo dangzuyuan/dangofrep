@@ -23,7 +23,11 @@ export function adaptEvents(rawEvents) {
       if (startTime && startTime.length === 5) startTime = startTime + ":00";
 
       var endTime = "";
-      if (ev.dur !== undefined && ev.dur !== null && startTime) {
+      /* ⚡修复：优先读取 ev.end 结束时间字段 */
+      if (ev.end) {
+        endTime = String(ev.end);
+        if (endTime && endTime.length === 5) endTime = endTime + ":00";
+      } else if (ev.dur !== undefined && ev.dur !== null && startTime) {
         var parts = startTime.split(":").map(Number);
         var endMin = parts[0] * 60 + parts[1] + Number(ev.dur);
         var eh = Math.floor(endMin / 60);
